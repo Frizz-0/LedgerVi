@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LedgerVi </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a45;
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-zinc-950 text-zinc-100 min-h-screen font-mono antialiased selection:bg-zinc-200 selection:text-zinc-900">
+
+    <div class="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+
+        <header class="flex justify-between items-center pb-4 border-b border-zinc-900">
+            <h1 class="text-base font-black tracking-[0.25em] text-zinc-100">LEDGERVI</h1>
+            <div id="statusLabel"
+                class="text-xs px-3 py-1 rounded-sm bg-zinc-950 border border-zinc-800 text-zinc-200 tracking-wider font-bold transition-all">
+                SYSTEM_IDLE</div>
+        </header>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
+                <span class="text-[10px] text-zinc-500 uppercase tracking-widest block font-bold">Ledger Logs</span>
+                <div id="metricCount" class="text-2xl font-light text-zinc-100 mt-1 tracking-tight">0</div>
+            </div>
+            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
+                <span class="text-[10px] text-emerald-500 uppercase tracking-widest block font-bold">Authorized
+                    Capital</span>
+                <div id="metricPayout" class="text-2xl font-mono text-emerald-100 mt-1 tracking-tight">£0.00</div>
+            </div>
+            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
+                <span class="text-[10px] text-slate-500 uppercase tracking-widest block font-bold">Leakage
+                    Mitigated</span>
+                <div id="metricLeakage" class="text-2xl font-mono text-slate-200 mt-1 tracking-tight">£0.00</div>
+            </div>
+            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
+                <span class="text-[10px] text-rose-500 uppercase tracking-widest block font-bold">Active Escrow
+                    Holds</span>
+                <div id="metricEscrow" class="text-2xl font-mono text-rose-100 mt-1 tracking-tight">£0.00</div>
+            </div>
+        </section>
+
+        <section
+            class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-zinc-900/10 border border-zinc-900 p-6 rounded-sm shadow-md">
+            <div class="lg:col-span-4 bg-zinc-950/40 p-3 border border-zinc-900/80 space-y-2 rounded-sm text-[10px]">
+                <span class="text-xs text-blue-200 block uppercase font-bold border-b border-zinc-900 pb-1.5">Patient
+                    Profile</span>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-2">
+                        <label class="text-zinc-600 block mb-0.5">Full Name</label>
+                        <input type="text" id="inputName" value="Eleanor Vance"
+                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-zinc-600 block mb-0.5">Age</label>
+                        <input type="number" id="inputAge" value="64"
+                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-zinc-600 block mb-0.5">Sex</label>
+                        <select id="inputSex"
+                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                            <option value="FEMALE">FEMALE</option>
+                            <option value="MALE">MALE</option>
+                            <option value="OTHERS">OTHERS</option>
+
+                        </select>
+                    </div>
+                    <!-- ADDED: Enrollment Date Field Input -->
+                    <div class="col-span-2">
+                        <label class="text-zinc-600 block mb-0.5">Enrollment Date</label>
+                        <input type="text" id="inputEnrollment" value="15/01/2026"
+                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                    </div>
+                    <div class="col-span-3">
+                        <label class="text-zinc-600 block mb-0.5">Trial Cohort Segment</label>
+                        <input type="text" id="inputCohort" value="Arm-B (High Toxicity Max Compounds)"
+                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="lg:col-span-4 bg-zinc-950/40 p-4 border-2 border-zinc-800/80 space-y-3 rounded-sm relative group hover:border-zinc-700 transition-colors">
+                <div
+                    class="absolute -top-2 left-3 bg-zinc-950 px-2 text-[8px] text-blue-400 font-bold uppercase tracking-widest">
+                    CRITICAL LEDGER VALUES *</div>
+                <span class="text-xs text-blue-200 block uppercase font-bold border-b border-zinc-900 pb-1.5">Invoice
+                    Breakdown</span>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Isolation *</label>
+                        <input type="number" id="feeIso" value="90000"
+                            class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Labor *</label>
+                        <input type="number" id="feeLabor" value="20000"
+                            class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Aux Meds *</label>
+                        <input type="number" id="feeMed" value="15000"
+                            class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
+                    </div>
+                    <div class="col-span-3 pt-1">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Thread Key
+                                    *</label>
+                                <input type="text" id="threadId" value="tx_ref_9922"
+                                    class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-bold text-blue-300 focus:outline-none focus:border-blue-500 rounded-sm">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-zinc-500 block mb-1 uppercase">Gross Total</label>
+                                <input type="number" id="claimAmount" value="125000"
+                                    class="w-full bg-zinc-950 border border-zinc-900 p-2 text-xs text-emerald-400 font-bold focus:outline-none"
+                                    disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="lg:col-span-4 bg-zinc-950/40 p-4 border border-zinc-900/80 flex flex-col justify-between rounded-sm">
+                <div class="space-y-2">
+                    <span
+                        class="text-xs text-blue-200 block uppercase font-bold border-b border-zinc-900 pb-1.5">Longitudinal
+                        History Logs</span>
+                    <div class="space-y-2 max-h-[96px] overflow-y-auto pr-1" id="historyInputContainer">
+                        <div class="grid grid-cols-12 gap-1.5 history-row items-center">
+                            <input type="text" placeholder="Date"
+                                class="col-span-3 bg-zinc-900 border border-zinc-800 px-1 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                value="10/02/2026">
+                            <input type="text" placeholder="Sev"
+                                class="col-span-2 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                value="Grade 1">
+                            <input type="text" placeholder="Description"
+                                class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                value="Mild Headache">
+                            <button onclick="removeHistoryRow(this)"
+                                class="col-span-2 text-[12px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">[X]</button>
+                        </div>
+                        <div class="grid grid-cols-12 gap-1.5 history-row items-center">
+                            <input type="text" placeholder="Date"
+                                class="col-span-3 bg-zinc-900 border border-zinc-800 px-1 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                value="18/05/2026">
+                            <input type="text" placeholder="Sev"
+                                class="col-span-2 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                value="Grade 2">
+                            <input type="text" placeholder="Description"
+                                class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                value="Acute Toxic Localized Rash">
+                            <button onclick="removeHistoryRow(this)"
+                                class="col-span-2 text-[12px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">[X]</button>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="addNewHistoryRow()"
+                    class="text-[10px] uppercase tracking-wider text-blue-400 hover:text-blue-300 text-left pt-2 font-bold">+
+                    Append History Row</button>
+            </div>
+        </section>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <div
+                class="lg:col-span-6 bg-zinc-900/10 border-2 border-zinc-800 p-5 rounded-sm flex flex-col justify-between shadow-md relative group hover:border-zinc-700 transition-colors">
+                <div
+                    class="absolute -top-2 left-4 bg-zinc-950 px-2 text-[8px] text-blue-400 font-bold uppercase tracking-widest">
+                    CRITICAL UNSTRUCTURED DATA ENTRY *</div>
+                <div class="space-y-2 flex-1 flex flex-col">
+                    <span
+                        class="text-xs text-zinc-400 uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">Doctor's
+                        Clinical Activity Records Note Narrative *</span>
+                    <textarea id="procedureNotes"
+                        class="w-full flex-1 min-h-[150px] bg-zinc-950 border-2 border-zinc-800 p-3 rounded-sm text-xs text-zinc-100 focus:outline-none focus:border-blue-500 resize-none font-sans leading-relaxed tracking-wide">Emergency Administration of high-dose Macrolide compound and private ward isolation. Patient exhibited acute respiratory distress and severe skin lesions following standard trial drug baseline delivery.</textarea>
+                </div>
+                <button id="ingestBtn" onclick="runIngestPipeline()"
+                    class="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold py-3 text-xs uppercase tracking-widest transition-all mt-4">
+                    Process Pipeline Turn
+                </button>
+            </div>
+
+            <div
+                class="lg:col-span-6 bg-zinc-900/10 border border-zinc-900 p-5 rounded-sm flex flex-col justify-between shadow-md">
+                <div class="space-y-4 flex-1 flex flex-col">
+                    <span
+                        class="text-xs text-zinc-500 uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">Core
+                        Analytics Stream Output</span>
+
+                    <div class="grid grid-cols-2 gap-4 text-xs">
+                        <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-sm">
+                            <span class="text-[10px] text-zinc-500 uppercase block font-bold">Authorized Settlement
+                                Base</span>
+                            <div id="ledgerPayout" class="text-xl font-mono text-zinc-100 mt-0.5">£0.00</div>
+                        </div>
+                        <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-sm">
+                            <span class="text-[10px] text-zinc-500 uppercase block font-bold">Escrow Mitigation
+                                Hold</span>
+                            <div id="ledgerDispute" class="text-xl font-mono text-zinc-300 mt-0.5">£0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 bg-zinc-950 p-2.5 border border-zinc-900 text-xs">
+                        <div><span class="text-zinc-600 block text-[9px] uppercase font-bold">Matched Reg ID</span><span
+                                id="trustReg" class="text-zinc-300 font-bold">--</span></div>
+                        <div><span class="text-zinc-600 block text-[9px] uppercase font-bold">Matched Clause
+                                ID</span><span id="trustClause" class="text-zinc-300 font-bold">--</span></div>
+                        <div><span class="text-zinc-600 block text-[9px] uppercase font-bold">RAG Confidence
+                                Vector</span><span id="trustScore" class="text-zinc-400 font-bold">--</span></div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col">
+                        <div id="verdictDisplay"
+                            class="bg-zinc-950/60 border border-zinc-900  text-xs text-slate-300 p-5 text-center min-h-[64px] max-h-[82px] overflow-y-auto  rounded-sm border transition-all font-mono">
+                            [ Awaiting pipeline initialization... ]</div>
+                    </div>
+                </div>
+
+                <div id="actionPanel" class="hidden mt-3 pt-3 border-t border-zinc-900">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="commitHumanAction('APPROVE')"
+                            class="bg-zinc-800 hover:bg-green-700 text-zinc-100 text-xs font-bold py-3 border border-zinc-700 uppercase tracking-wider transition-colors">Authorize
+                            Base</button>
+                        <button onclick="commitHumanAction('ESCALATE')"
+                            class="bg-zinc-950 border border-zinc-800 hover:bg-amber-900 text-zinc-400 hover:text-zinc-200 text-xs font-bold py-3 uppercase tracking-wider transition-colors">Escalate
+                            Legal</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-sm text-xs shadow-inner">
+            <span
+                class="text-xs font-bold text-blue-200 uppercase tracking-wider block border-b border-zinc-900 pb-2">Active
+                Summary</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 pt-3 text-zinc-400">
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Subject Label</span><span
+                        id="cardName" class="text-zinc-300 font-bold">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Biological Sex</span><span
+                        id="cardSex" class="text-zinc-300 font-bold">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Age Parameter</span><span
+                        id="cardAge" class="text-zinc-300 font-bold">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Active Cohort</span><span
+                        id="cardCohort" class="text-zinc-300 font-bold break-words block">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Enrollment Date</span><span
+                        id="cardEnrollment">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Telemetry State</span><span
+                        id="cardTelemetry" class="text-zinc-600 font-bold">STANDBY</span></div>
+                <div class="col-span-2 sm:col-span-4 lg:col-span-1"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold">Longitudinal Stream</span><span
+                        id="cardHistory" class="text-zinc-400 block break-words">--</span></div>
+            </div>
+        </div>
+
+        <section class="bg-zinc-900/10 border border-zinc-900 p-6 rounded-sm space-y-4 shadow-xl">
+            <div
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-900 pb-3">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-blue-200">History
+                        Archive</h2>
+                </div>
+                <div class="w-full sm:w-64 relative">
+                    <input type="text" id="registrySearchInput" onkeyup="filterRegistryTable()"
+                        placeholder="Search registry..."
+                        class="w-full bg-zinc-950 border border-zinc-800 px-3 py-2 pl-7 rounded-sm text-xs focus:outline-none">
+                    <span class="absolute left-2 top-2 text-zinc-700 text-xs font-bold">⌕</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-zinc-900 text-[10px] text-zinc-500 uppercase tracking-widest">
+                            <th class="py-3 px-2">Thread identifier</th>
+                            <th class="py-3 px-2">Subject record</th>
+                            <th class="py-3 px-2">Gross Claim</th>
+                            <th class="py-3 px-2">Authorized Base</th>
+                            <th class="py-3 px-2">Routing status</th>
+                            <th class="py-3 px-2 text-right">Dossier</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="text-xs divide-y divide-zinc-900/50 text-zinc-400">
+                        <tr>
+                            <td colspan="6" class="py-4 text-center text-zinc-600 italic">No archive log matrices
+                                available.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="dossierModal"
+        class="hidden fixed inset-0 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-zinc-900 border border-zinc-800 max-w-xl w-full p-6 shadow-2xl rounded-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-zinc-900 pb-2">
+                <h4 id="modalTitle" class="text-xs font-bold text-zinc-400 uppercase tracking-widest">[DOSSIER]
+                    EXTRACTED PROFILES</h4>
+                <button onclick="closeModal()" class="text-zinc-600 hover:text-zinc-300 text-xs font-bold">[ESC]
+                    CLOSE</button>
+            </div>
+            <div
+                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-zinc-950 p-4 border border-zinc-900 text-zinc-400 text-xs leading-relaxed">
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Patient Identity Name</span><span
+                        id="mName" class="text-zinc-200 font-bold"></span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Biological Sex</span><span
+                        id="mSex" class="text-zinc-200 font-bold"></span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Age Matrix Profile</span><span
+                        id="mAge" class="text-zinc-200 font-bold"></span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Assigned Trial Cohort</span><span
+                        id="mCohort" class="text-zinc-300 font-bold break-words block"></span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Timeline History
+                        Tracks</span><span id="mHistory" class="text-zinc-300 block break-words"></span></div>
+                <div class="border-t border-zinc-900 pt-2"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold">Isolation Fees Paid</span><span
+                        id="mFeeIso" class="text-emerald-300 font-bold"></span></div>
+                <div class="border-t border-zinc-900 pt-2"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold">Labor Compounding Paid</span><span
+                        id="mFeeLabor" class="text-emerald-300 font-bold"></span></div>
+                <div class="border-t border-zinc-900 pt-2"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold">Matched RAG Vectors Layer</span><span
+                        id="mTrust" class="text-zinc-300 font-bold"></span></div>
+                <div class="col-span-2 border-t border-zinc-900 pt-1.5"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold">Database Commit Timestamp</span><span
+                        id="mTime" class="text-zinc-300 font-bold"></span></div>
+            </div>
+            <div class="border-t border-zinc-900 pt-3 space-y-2">
+                <h5 class="text-[9px] text-rose-500 font-bold uppercase tracking-wider"> PRIVACY CONTROL: COMPLIANCE
+                    ERASURE PROTOCOL</h5>
+                <div class="flex gap-2">
+                    <input type="password" id="adminToken" placeholder="Enter Administrative Key"
+                        class="flex-1 bg-zinc-950 border border-zinc-800 p-2 text-xs text-rose-400 focus:outline-none">
+                    <button id="purgeBtn"
+                        class="bg-rose-950/20 hover:bg-rose-900/40 border border-rose-900 text-rose-300 px-4 py-2 uppercase font-bold text-xs">Purge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+        let localHistoryCache = [];
+
+        ['feeIso', 'feeLabor', 'feeMed'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                const total = parseFloat(document.getElementById('feeIso').value || 0) +
+                    parseFloat(document.getElementById('feeLabor').value || 0) +
+                    parseFloat(document.getElementById('feeMed').value || 0);
+                document.getElementById('claimAmount').value = total;
+            });
+        });
+
+        function addNewHistoryRow() {
+            const container = document.getElementById("historyInputContainer");
+            const newRow = document.createElement("div");
+            newRow.className = "grid grid-cols-12 gap-1.5 history-row items-center mt-1 animate-fadeIn";
+            newRow.innerHTML = `
+                <input type="text" placeholder="Date" class="col-span-3 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm" value="03/06/2026">
+                <input type="text" placeholder="Sev" class="col-span-2 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm" value="Grade 1">
+                <input type="text" placeholder="Description" class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm">
+                <button onclick="removeHistoryRow(this)" class="col-span-2 text-[10px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">-[X]</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // Section 1: Erase a data entry logging row completely from current cache space views
+        function removeHistoryRow(button) {
+            const row = button.closest(".history-row");
+            if (row) {
+                row.remove();
+                // Dynamically recalculate claim totals to adapt if metrics shifted
+                const total = parseFloat(document.getElementById('feeIso').value || 0) +
+                    parseFloat(document.getElementById('feeLabor').value || 0) +
+                    parseFloat(document.getElementById('feeMed').value || 0);
+                document.getElementById('claimAmount').value = total;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await fetchMetrics();
+            await fetchHistory();
+        });
+
+        async function fetchMetrics() {
+            try {
+                const res = await fetch(`${API}/api/claims/metrics`);
+                updateMetrics(await res.json());
+            } catch (err) { console.error(err); }
+        }
+
+        async function fetchHistory() {
+            try {
+                const res = await fetch(`${API}/api/claims/history`);
+                localHistoryCache = await res.json();
+                renderTable(localHistoryCache);
+            } catch (err) { console.error(err); }
+        }
+
+        function renderTable(dataset) {
+            const tbody = document.getElementById("historyTableBody");
+            if (dataset.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-zinc-600 italic">No storage entries mapped.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = dataset.map((r, index) => `
+                <tr class="hover:bg-zinc-900/30 transition-all border-b border-zinc-900/30">
+                    <td class="py-3 px-2 text-zinc-300 font-bold tracking-wider">${r.thread_id}</td>
+                    <td class="py-3 px-2 text-zinc-400">${r.patient_name}</td>
+                    <td class="py-3 px-2 text-zinc-500">£${r.claim_amount.toLocaleString()}</td>
+                    <td class="py-3 px-2 text-emerald-500 font-bold">£${r.payout_amount.toLocaleString()}</td>
+                    <td class="py-3 px-2">
+                        <span class="text-[9px] px-2 py-0.5 border font-bold ${r.status === 'APPROVE' ? 'bg-emerald-950/20 text-emerald-400 border-emerald-900/60' : 'bg-amber-950/40 text-amber-400 border-amber-900/60'}">${r.status}</span>
+                    </td>
+                    <td class="py-3 px-2 text-right">
+                        <button onclick="openDossierModal(${index})" class="text-[9px] border border-zinc-800 bg-zinc-950/80 px-2.5 py-0.5 uppercase font-bold text-zinc-500 hover:text-zinc-900 hover:border-zinc-700 hover:bg-zinc-300 transition-all">Inspect</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterRegistryTable() {
+            const query = document.getElementById("registrySearchInput").value.toLowerCase().trim();
+            const filteredData = localHistoryCache.filter(r => {
+                return r.thread_id.toLowerCase().includes(query) || r.patient_name.toLowerCase().includes(query) || r.status.toLowerCase().includes(query);
+            });
+            renderTable(filteredData);
+        }
+
+        function openDossierModal(index) {
+            const data = localHistoryCache[index];
+            document.getElementById("modalTitle").innerText = `[DOSSIER] KEY: ${data.thread_id}`;
+            document.getElementById("mName").innerText = data.patient_name;
+            document.getElementById("mSex").innerText = data.patient_sex || "MALE";
+            document.getElementById("mAge").innerText = data.patient_age ? `${data.patient_age} Years Old` : "42 Years Old";
+            document.getElementById("mCohort").innerText = data.patient_cohort;
+            document.getElementById("mHistory").innerText = data.clinical_history_summary || "None Mapped";
+            document.getElementById("mFeeIso").innerText = `£${data.invoice_isolation_fees.toLocaleString()}`;
+            document.getElementById("mFeeLabor").innerText = `£${data.invoice_labor_fees.toLocaleString()}`;
+            document.getElementById("mTrust").innerText = `${data.matched_rule_id} & ${data.matched_clause_id} (${data.rag_confidence_percentage}%)`;
+            document.getElementById("mTime").innerText = data.time_approved;
+            document.getElementById("purgeBtn").onclick = () => executeRecordPurge(data.thread_id);
+            document.getElementById("dossierModal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("dossierModal").classList.add("hidden");
+            document.getElementById("adminToken").value = "";
+        }
+
+        async function executeRecordPurge(threadId) {
+            const token = document.getElementById("adminToken").value.trim();
+            if (!token) { alert("Admin token required!"); return; }
+            try {
+                const res = await fetch(`${API}/api/claims/purge/${threadId}?admin_signature=${token}`, { method: "DELETE" });
+                if (res.status === 403) { alert("Access Denied."); return; }
+                closeModal(); await fetchMetrics(); await fetchHistory();
+            } catch (err) { alert("Purge fault."); }
+        }
+
+        function updateMetrics(metrics) {
+            document.getElementById("metricCount").innerText = metrics.total_claims_processed;
+            document.getElementById("metricPayout").innerText = `£${metrics.total_payouts_authorized.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            document.getElementById("metricLeakage").innerText = `£${metrics.total_capital_leakage_prevented.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            document.getElementById("metricEscrow").innerText = `£${metrics.active_disputed_escrow.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        }
+
+        async function runIngestPipeline() {
+            const targetThread = document.getElementById("threadId").value.trim();
+            const btn = document.getElementById("ingestBtn");
+            btn.disabled = true; btn.innerText = "RUNNING COMPLIANCE GRAPH...";
+            document.getElementById("statusLabel").innerText = "CORE_PROCESSING";
+
+            const historyLogs = [];
+            const rows = document.querySelectorAll(".history-row");
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll("input");
+                if (inputs[0].value && inputs[1].value) {
+                    historyLogs.push({
+                        "date": inputs[0].value.trim(),
+                        "severity": inputs[1].value.trim(),
+                        "condition": inputs[2].value.trim()
+                    });
+                }
+            });
+
+            try {
+                const res = await fetch(`${API}/api/claims/ingest?thread_id=${targetThread}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        trial_id: "PHARMA-TRIAL-2026-X",
+                        patient_profile: {
+                            subject_id: "SUBJ-8841",
+                            full_name: document.getElementById("inputName").value.trim(),
+                            biological_sex: document.getElementById("inputSex").value,
+                            age: parseInt(document.getElementById("inputAge").value || 0),
+                            trial_cohort: document.getElementById("inputCohort").value.trim(),
+                            enrollment_date: document.getElementById("inputEnrollment").value.trim(),
+                            event_incident_date: "02/06/2026",
+                            prior_adverse_events: historyLogs.length,
+                            telemetry_status: "ACTIVE_STREAMING",
+                            history_logs: historyLogs
+                        },
+                        invoice: {
+                            isolation_ward_fees: parseFloat(document.getElementById("feeIso").value || 0),
+                            compounding_labor_fees: parseFloat(document.getElementById("feeLabor").value || 0),
+                            auxiliary_medication_fees: parseFloat(document.getElementById("feeMed").value || 0)
+                        },
+                        procedure: document.getElementById("procedureNotes").value.trim()
+                    })
+                });
+                const data = await res.json();
+
+                document.getElementById("ledgerPayout").innerText = `£${data.authorized_payout.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                document.getElementById("ledgerDispute").innerText = `£${data.escrow_dispute.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+
+                const verdictBlock = document.getElementById("verdictDisplay");
+                const statusBadge = document.getElementById("statusLabel");
+                const telemetryBadge = document.getElementById("cardTelemetry");
+
+                verdictBlock.innerText = data.verdict;
+                verdictBlock.className = "p-3 text-xs leading-relaxed min-h-[64px] max-h-[82px] overflow-y-auto whitespace-pre-wrap rounded-sm border font-sans ";
+
+                if (data.verdict.includes("HIGH_MEDICAL_RISK")) {
+                    verdictBlock.classList.add("bg-rose-950/20", "text-rose-300", "border-rose-900/60");
+                    statusBadge.className = "text-xs px-2.5 py-1 rounded-sm bg-rose-950 text-rose-400 border border-rose-900 font-bold";
+                    telemetryBadge.innerText = "CRITICAL_ALERT";
+                    telemetryBadge.className = "text-rose-400 font-bold text-xs";
+                } else if (data.verdict.includes("HIGH_FINANCIAL_RISK")) {
+                    verdictBlock.classList.add("bg-amber-950/20", "text-amber-300", "border-amber-900/60");
+                    statusBadge.className = "text-xs px-2.5 py-1 rounded-sm bg-amber-950 text-amber-400 border border-amber-900 font-bold";
+                    telemetryBadge.innerText = "SUSPENDED_AUDIT";
+                    telemetryBadge.className = "text-amber-400 font-bold text-xs";
+                } else {
+                    verdictBlock.classList.add("bg-emerald-950/20", "text-emerald-300", "border-emerald-900/60");
+                    statusBadge.className = "text-xs px-2.5 py-1 rounded-sm bg-emerald-950 text-emerald-400 border border-emerald-900 font-bold";
+                    telemetryBadge.innerText = "ACTIVE_STREAMING";
+                    telemetryBadge.className = "text-emerald-400 font-bold text-xs";
+                }
+
+                document.getElementById("trustReg").innerText = data.matched_rule_id;
+                document.getElementById("trustClause").innerText = data.matched_clause_id;
+                document.getElementById("trustScore").innerText = `${data.rag_confidence_percentage}% Match`;
+
+                document.getElementById("cardName").innerText = data.patient_name;
+                document.getElementById("cardSex").innerText = data.patient_sex;
+                document.getElementById("cardAge").innerText = `${data.patient_age} Y/O`;
+                document.getElementById("cardCohort").innerText = data.patient_cohort;
+                document.getElementById("cardEnrollment").innerText = data.patient_enrollment;
+                document.getElementById("cardHistory").innerText = data.clinical_history_summary;
+
+                document.getElementById("statusLabel").innerText = "TRANSACTION_PAUSED";
+                updateMetrics(data.metrics);
+                document.getElementById("actionPanel").classList.remove("hidden");
+
+            } catch (err) {
+                alert("Interface system connection broken.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Process Pipeline Turn";
+            }
+        }
+
+        async function commitHumanAction(action) {
+            const targetThread = document.getElementById("threadId").value.trim();
+            try {
+                await fetch(`${API}/api/claims/action?thread_id=${targetThread}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: action })
+                });
+                document.getElementById("statusLabel").innerText = "TRANSACTION_CLOSED";
+                document.getElementById("statusLabel").className = "text-xs px-2.5 py-1 rounded-sm bg-zinc-950 text-zinc-600 border border-zinc-900 font-bold";
+                await fetchMetrics(); await fetchHistory();
+                document.getElementById("actionPanel").classList.add("hidden");
+            } catch (err) { alert("Action exception."); }
+        }
+    </script>
+</body>
+
+</html>
