@@ -238,19 +238,47 @@
                             class="bg-zinc-950/60 border border-zinc-900  text-xs text-slate-300 p-5 text-center min-h-[64px] max-h-[82px] overflow-y-auto  rounded-sm border transition-all font-mono">
                             [ Awaiting pipeline initialization... ]</div>
                     </div>
-                </div>
+                    <div class="bg-zinc-950 p-2.5 border border-zinc-900 text-xs rounded-sm mt-2">
+                        <details class="group">
+                            <summary
+                                class="text-[10px] text-blue-400 uppercase font-bold tracking-wider cursor-pointer list-none flex justify-between items-center select-none">
+                                <span> View Matched Source Regulatory & Clause </span>
+                                <span class="group-open:rotate-180 transition-transform duration-200">▼</span>
+                            </summary>
+                            <div class="mt-2 border-t border-zinc-900 pt-2 space-y-3 font-sans">
+                                <div>
+                                    <span
+                                        class="text-[9px] text-amber-500 font-mono font-bold block uppercase tracking-wider mb-1">
+                                        Rule Context:</span>
+                                    <div class="text-[11px] text-zinc-400 italic leading-relaxed pl-2 border-l-2 border-amber-900/60"
+                                        id="ragRuleDisplay">
+                                        Awaiting pipeline execution vector matches...
+                                    </div>
+                                </div>
+                                <div>
+                                    <span
+                                        class="text-[9px] text-blue-400 font-mono font-bold block uppercase tracking-wider mb-1">
+                                        Clause Context:</span>
+                                    <div class="text-[11px] text-zinc-400 italic leading-relaxed pl-2 border-l-2 border-blue-900/60"
+                                        id="ragClauseDisplay">
+                                        Awaiting pipeline execution vector matches...
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
 
-                <div id="actionPanel" class="hidden mt-3 pt-3 border-t border-zinc-900">
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="commitHumanAction('APPROVE')"
-                            class="bg-zinc-800 hover:bg-green-700 text-zinc-100 text-xs font-bold py-3 border border-zinc-700 uppercase tracking-wider transition-colors">Authorize
-                            Base</button>
-                        <button onclick="commitHumanAction('ESCALATE')"
-                            class="bg-zinc-950 border border-zinc-800 hover:bg-amber-900 text-zinc-400 hover:text-zinc-200 text-xs font-bold py-3 uppercase tracking-wider transition-colors">Escalate
-                            Legal</button>
+                    <div id="actionPanel" class="hidden mt-3 pt-3 border-t border-zinc-900">
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="commitHumanAction('APPROVE')"
+                                class="bg-zinc-800 hover:bg-green-700 text-zinc-100 text-xs font-bold py-3 border border-zinc-700 uppercase tracking-wider transition-colors">Authorize
+                                Base</button>
+                            <button onclick="commitHumanAction('ESCALATE')"
+                                class="bg-zinc-950 border border-zinc-800 hover:bg-amber-900 text-zinc-400 hover:text-zinc-200 text-xs font-bold py-3 uppercase tracking-wider transition-colors">Escalate
+                                Legal</button>
+                        </div>
                     </div>
                 </div>
-            </div>
         </main>
 
         <div class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-sm text-xs shadow-inner">
@@ -323,7 +351,7 @@
                     CLOSE</button>
             </div>
             <div
-                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-zinc-950 p-4 border border-zinc-900 text-zinc-400 text-xs leading-relaxed">
+                class="grid grid-cols-2 gap-x-4 gap-y-2.5 bg-zinc-950 p-4 border border-zinc-900 text-zinc-400 text-xs leading-relaxed">
                 <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Patient Identity Name</span><span
                         id="mName" class="text-zinc-200 font-bold"></span></div>
                 <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Biological Sex</span><span
@@ -332,17 +360,36 @@
                         id="mAge" class="text-zinc-200 font-bold"></span></div>
                 <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Assigned Trial Cohort</span><span
                         id="mCohort" class="text-zinc-300 font-bold break-words block"></span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Timeline History
-                        Tracks</span><span id="mHistory" class="text-zinc-300 block break-words"></span></div>
+                <div class="col-span-2"><span class="text-[9px] text-zinc-600 block uppercase font-bold">Timeline
+                        History Tracks</span><span id="mHistory" class="text-zinc-300 block break-words"></span></div>
+
                 <div class="border-t border-zinc-900 pt-2"><span
                         class="text-[9px] text-zinc-600 block uppercase font-bold">Isolation Fees Paid</span><span
-                        id="mFeeIso" class="text-emerald-300 font-bold"></span></div>
+                        id="mFeeIso" class="text-zinc-300"></span></div>
                 <div class="border-t border-zinc-900 pt-2"><span
                         class="text-[9px] text-zinc-600 block uppercase font-bold">Labor Compounding Paid</span><span
-                        id="mFeeLabor" class="text-emerald-300 font-bold"></span></div>
-                <div class="border-t border-zinc-900 pt-2"><span
+                        id="mFeeLabor" class="text-zinc-300"></span></div>
+                <div class="col-span-2 border-t border-zinc-900 pt-2"><span
                         class="text-[9px] text-zinc-600 block uppercase font-bold">Matched RAG Vectors Layer</span><span
                         id="mTrust" class="text-zinc-300 font-bold"></span></div>
+
+                <div
+                    class="col-span-2 border-t border-zinc-900 pt-2 bg-zinc-900/20 p-2 border border-zinc-900 rounded-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[9px] text-blue-400 uppercase font-bold">Final Action Decision</span>
+                        <span id="mStatus"
+                            class="text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-sm"></span>
+                    </div>
+                    <!-- <div class="mt-1"><span class="text-[8px] text-zinc-500 block uppercase">Risk Tier
+                            Designation</span><span id="mRiskTier"
+                            class="text-zinc-300 font-mono font-bold text-[11px]"></span></div> -->
+                    <div class="mt-1">
+                        <!-- <span class="text-[8px] text-zinc-500 block uppercase">Auditor Synthesis Log</span> -->
+                        <span id="mReason"
+                            class="text-zinc-400 text-[11px] font-sans block leading-normal mt-0.5 whitespace-pre-wrap"></span>
+                    </div>
+                </div>
+
                 <div class="col-span-2 border-t border-zinc-900 pt-1.5"><span
                         class="text-[9px] text-zinc-600 block uppercase font-bold">Database Commit Timestamp</span><span
                         id="mTime" class="text-zinc-300 font-bold"></span></div>
@@ -461,6 +508,19 @@
             document.getElementById("mFeeLabor").innerText = `£${data.invoice_labor_fees.toLocaleString()}`;
             document.getElementById("mTrust").innerText = `${data.matched_rule_id} & ${data.matched_clause_id} (${data.rag_confidence_percentage}%)`;
             document.getElementById("mTime").innerText = data.time_approved;
+
+            // BIND THE NEW VARIABLES FROM YOUR POSTGRES SCHEMA CACHE
+            // document.getElementById("mRiskTier").innerText = data.matched_rule_id + " / " + data.matched_clause_id;
+            document.getElementById("mReason").innerText = data.system_verdict || "No automated audit remarks logged.";
+            // Dynamic Status Color Badge Controller for the Modal View
+            const statusBox = document.getElementById("mStatus");
+            statusBox.innerText = data.status;
+            if (data.status === 'APPROVE') {
+                statusBox.className = "text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-sm bg-emerald-950/40 text-emerald-400 border-emerald-900/60";
+            } else {
+                statusBox.className = "text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-sm bg-amber-950/40 text-amber-400 border-amber-900/60";
+            }
+
             document.getElementById("purgeBtn").onclick = () => executeRecordPurge(data.thread_id);
             document.getElementById("dossierModal").classList.remove("hidden");
         }
@@ -571,10 +631,13 @@
                 document.getElementById("cardCohort").innerText = data.patient_cohort;
                 document.getElementById("cardEnrollment").innerText = data.patient_enrollment;
                 document.getElementById("cardHistory").innerText = data.clinical_history_summary;
+                document.getElementById("ragRuleDisplay").innerText = data.raw_rule_text || "No corporate rule framework text returned.";
+                document.getElementById("ragClauseDisplay").innerText = data.raw_clause_text || "No baseline contract clause text returned.";
 
                 document.getElementById("statusLabel").innerText = "TRANSACTION_PAUSED";
                 updateMetrics(data.metrics);
                 document.getElementById("actionPanel").classList.remove("hidden");
+
 
             } catch (err) {
                 alert("Interface system connection broken.");

@@ -77,6 +77,7 @@ def cognitive_extractor_node(state: TrialState):
 def medical_researcher_node(state: TrialState):
     print("🔬 [Worker: Medical Researcher] Fetching protocol vectors...")
     matched_reg = trialguard_db.query_medical(state["procedure_notes"])
+    # matched_regulatory_text = trialguard_db.query_regulatory(state["procedure_notes"])
     rule_id = matched_reg.split(":")[0] if ":" in matched_reg else "REG-UNKNOWN"
     
     prompt = f"""
@@ -89,6 +90,7 @@ def medical_researcher_node(state: TrialState):
     return {
         "medical_context": response['message']['content'].strip(),
         "matched_rule_id": rule_id,
+        "raw_rule_text": matched_reg,
         "medical_checked": True,
         "next_step": "SUPERVISOR"
     }
@@ -151,9 +153,34 @@ def fintech_underwriter_node(state: TrialState):
         "authorized_payout": payout,
         "escrow_dispute_amount": dispute,
         "matched_clause_id": clause_id,
+        "raw_clause_text": matched_contract,
         "rag_confidence_percentage": 94.5,
         "financial_checked": True,
         "next_step": "SUPERVISOR"
+    }
+
+def medical_circuit_breaker_node(state: TrialState):
+    print("🛑 [System Override] Checking medical risk circuit triggers...")
+    
+    # Calculate the total gross claim amount to backstop the escrow hold value cleanly
+    gross_claim = float(state.get("claim_amount", 0.0))
+    
+    # If the risk grader or researcher flagged high medical risk, wipe out the payout
+    if "HIGH_MEDICAL_RISK" in state.get("triage_verdict", ""):
+        print("   -> BREAKER TRIPPED: Locking down all financial allocations.")
+        return {
+            "authorized_payout": 0.0,
+            "escrow_dispute_amount": gross_claim,
+            "financial_context": "⚠️ CRITICAL PROTOCOL BREACH: Payout frozen by Medical Circuit Breaker.",
+            "breaker_checked": True, # <-- FIX: Tell the supervisor this node has finished!
+            "next_step": "FINISH"
+        }
+        
+    # If everything is clear, pass through seamlessly
+    print("   -> Breaker Clear: Routing payload directly to final settlement execution.")
+    return {
+        "breaker_checked": True, # <-- FIX: Tell the supervisor this node has finished!
+        "next_step": "FINISH"
     }
 
 def risk_grader_node(state: TrialState):
@@ -193,5 +220,6 @@ def managing_director_supervisor_node(state: TrialState):
     if not state.get("medical_checked", False): target = "RESEARCHER"
     elif not state.get("financial_checked", False): target = "FINTECH_AUDITOR"
     elif not state.get("triage_checked", False): target = "RISK_GRADER"
+    elif not state.get("breaker_checked", False): return {"next_step": "CIRCUIT_CHECK"}
     else: target = "FINISH"
     return {"next_step": target}

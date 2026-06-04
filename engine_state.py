@@ -41,6 +41,8 @@ class TrialState(TypedDict):
     patient_telemetry: str
     clinical_history_summary: str # Compiled timeline string for prompt/UI
     patient_prior_events: str
+    raw_clause_text: str
+    raw_rule_text:str 
     
     # Financial Matrix Slices
     claim_amount: float
@@ -109,3 +111,5 @@ class EnterpriseResponse(BaseModel):
     matched_clause_id: str
     rag_confidence_percentage: float
     metrics: MetricsResponse
+    raw_rule_text:str   
+    raw_clause_text: str
