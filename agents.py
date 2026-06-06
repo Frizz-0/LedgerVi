@@ -6,7 +6,7 @@ from database import trialguard_db
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
-# 1. CRITICAL: Initialize the environment keys FIRST before the client compiles
+# 1. CRITICAL: Initialize the environment keys FIRST before the client compile
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("GROQ_API_KEY", "")
 
