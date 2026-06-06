@@ -4,10 +4,13 @@ import os
 from engine_state import TrialState
 from database import trialguard_db
 from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
 
 # 1. CRITICAL: Initialize the environment keys FIRST before the client compiles
-os.environ["OPENAI_API_KEY"] = "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"
+load_dotenv()
+os.environ["OPENAI_API_KEY"] = os.getenv("GROQ_API_KEY", "")
 
+    
 # 2. Setup the sync cloud endpoint wrapper cleanly
 llm = ChatOpenAI(
     openai_api_base="https://api.groq.com/openai/v1",
