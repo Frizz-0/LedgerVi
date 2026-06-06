@@ -1,18 +1,27 @@
 # agents.py
 import json
-import ollama
+import os
 from engine_state import TrialState
 from database import trialguard_db
+from langchain_openai import ChatOpenAI
+
+# 1. CRITICAL: Initialize the environment keys FIRST before the client compiles
+os.environ["OPENAI_API_KEY"] = "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"
+
+# 2. Setup the sync cloud endpoint wrapper cleanly
+llm = ChatOpenAI(
+    openai_api_base="https://api.groq.com/openai/v1",
+    model_name="llama-3.1-8b-instant",
+    temperature=0.1
+)
 
 def ingestion_router_node(state: TrialState):
-    print("🤖 [System Router] Inspecting incoming data structural payloads...")
+    print("[System Router] Inspecting incoming data structural payloads...")
     
-    # Extract structural field balances safely
     iso = float(state.get("invoice_isolation_fees", 0.0))
     labor = float(state.get("invoice_labor_fees", 0.0))
     meds = float(state.get("invoice_medication_fees", 0.0))
     
-    # CRITICAL DETERMINATION: If the itemized inputs hold values, execute Path 1
     if (iso + labor + meds) > 0.0:
         print("   -> Route Confirmed: HYBRID (Structured line items identified).")
         return {
@@ -20,20 +29,19 @@ def ingestion_router_node(state: TrialState):
             "next_step": "RESEARCHER"
         }
     
-    # Otherwise, look at the text narrative block. If text exists, execute Path 2
     narrative = state.get("procedure_notes", "").strip()
     if len(narrative) > 20:
         print("   -> Route Confirmed: COGNITIVE (Parsing unstructured text narrative).")
         return {
             "ingestion_routing_path": "COGNITIVE",
-            "next_step": "COGNITIVE_EXTRACTOR" # A new node we will create next to extract entities
+            "next_step": "COGNITIVE_EXTRACTOR"
         }
         
     print("   -> Route Aborted: Insufficient data payload strings.")
     return {"ingestion_routing_path": "MALFORMED", "next_step": "FINISH"}
 
 def cognitive_extractor_node(state: TrialState):
-    print("🔬 [Worker: Cognitive Extractor] Parsing raw narrative strings into digits...")
+    print("[Worker: Cognitive Extractor] Parsing raw narrative strings into digits...")
     
     prompt = f"""
     Read this raw unstructured text note block from a hospital invoice submittal.
@@ -48,15 +56,12 @@ def cognitive_extractor_node(state: TrialState):
     }}
     """
     
-    response = ollama.chat(
-        model='llama3.1',
-        messages=[{'role': 'user', 'content': prompt}],
-        format='json',
-        options={"temperature": 0.0} # Force absolute predictability
-    )
+    # 📑 FIXED: Added active cloud execution invocation
+    response = llm.invoke(prompt)
     
     try:
-        data = json.loads(response['message']['content'].strip())
+        # 📑 FIXED: Adjusted parsing syntax to read the AIMessage structure (.content)
+        data = json.loads(response.content.strip())
         iso = float(data.get("extracted_isolation_fees", 0.0))
         labor = float(data.get("extracted_labor_fees", 0.0))
         meds = float(data.get("extracted_medication_fees", 0.0))
@@ -65,7 +70,6 @@ def cognitive_extractor_node(state: TrialState):
 
     print(f"   [Entity Extracted Values] Iso: £{iso} | Labor: £{labor} | Meds: £{meds}")
     
-    # Save the pulled digits back into the state array registers, updating the gross total
     return {
         "invoice_isolation_fees": iso,
         "invoice_labor_fees": labor,
@@ -73,11 +77,9 @@ def cognitive_extractor_node(state: TrialState):
         "claim_amount": float(iso + labor + meds)
     }
 
-
 def medical_researcher_node(state: TrialState):
-    print("🔬 [Worker: Medical Researcher] Fetching protocol vectors...")
+    print("[Worker: Medical Researcher] Fetching protocol vectors...")
     matched_reg = trialguard_db.query_medical(state["procedure_notes"])
-    # matched_regulatory_text = trialguard_db.query_regulatory(state["procedure_notes"])
     rule_id = matched_reg.split(":")[0] if ":" in matched_reg else "REG-UNKNOWN"
     
     prompt = f"""
@@ -86,9 +88,9 @@ def medical_researcher_node(state: TrialState):
     Regulation Context: {matched_reg}
     Provide a 1-sentence audit verdict. Do not include markdown keys or conversational fluff.
     """
-    response = ollama.chat(model='llama3.1', messages=[{'role': 'user', 'content': prompt}])
+    response = llm.invoke(prompt)
     return {
-        "medical_context": response['message']['content'].strip(),
+        "medical_context": response.content,
         "matched_rule_id": rule_id,
         "raw_rule_text": matched_reg,
         "medical_checked": True,
@@ -96,13 +98,12 @@ def medical_researcher_node(state: TrialState):
     }
 
 def fintech_underwriter_node(state: TrialState):
-    print("💰 [Worker: FinTech Underwriter] Executing structural deterministic audit...")
+    print("[Worker: FinTech Underwriter] Executing structural deterministic audit...")
     matched_contract, clause_id = trialguard_db.query_financial(state["procedure_notes"])
     if clause_id.startswith("fin_"):
         clause_id = matched_contract.split(":")[0] if ":" in matched_contract else "POLICY-UNKNOWN"
     
-    # Pre-calculate internal contract violations
-    labor_fee = state["invoice_labor_fees"]
+    labor_fee = state.get("invoice_labor_fees", 0.0)
     labor_overage = 0.0
     labor_notes = ""
     if labor_fee > 15000.0:
@@ -119,22 +120,23 @@ def fintech_underwriter_node(state: TrialState):
     "allowed_limit": the maximum number ceiling allowed by the clause (or the full claim if no cap exists)
     """
     
-    # CRITICAL STABILIZER: Force the local model to conform strictly to a JSON validation map
-    response = ollama.chat(
-        model='llama3.1', 
-        messages=[{'role': 'user', 'content': prompt}],
-        format='json'
-    )
+    response = llm.invoke(prompt)
     
     try:
-        data = json.loads(response['message']['content'].strip())
+        # 📑 FIXED: Changed old dict subscripting to object content property lookup (.content)
+        cleaned_content = response.content.strip()
+        if "```json" in cleaned_content:
+            cleaned_content = cleaned_content.split("```json")[1].split("```")[0].strip()
+        elif "```" in cleaned_content:
+            cleaned_content = cleaned_content.split("```")[1].split("```")[0].strip()
+            
+        data = json.loads(cleaned_content)
         is_exceeded = data.get("cap_exceeded", False)
         allowed = float(data.get("allowed_limit", state["claim_amount"]))
     except Exception:
         is_exceeded = False
         allowed = state["claim_amount"]
 
-    # Apply rigid business ledger logic calculations over the raw JSON values
     if is_exceeded and state["claim_amount"] > allowed:
         payout = allowed
         dispute = state["claim_amount"] - allowed
@@ -142,7 +144,6 @@ def fintech_underwriter_node(state: TrialState):
         payout = state["claim_amount"]
         dispute = 0.0
 
-    # Factor inside line item overages safely
     if labor_overage > 0.0:
         if (payout - labor_overage) >= 0:
             payout -= labor_overage
@@ -160,33 +161,28 @@ def fintech_underwriter_node(state: TrialState):
     }
 
 def medical_circuit_breaker_node(state: TrialState):
-    print("🛑 [System Override] Checking medical risk circuit triggers...")
-    
-    # Calculate the total gross claim amount to backstop the escrow hold value cleanly
+    print("[System Override] Checking medical risk circuit triggers...")
     gross_claim = float(state.get("claim_amount", 0.0))
     
-    # If the risk grader or researcher flagged high medical risk, wipe out the payout
     if "HIGH_MEDICAL_RISK" in state.get("triage_verdict", ""):
         print("   -> BREAKER TRIPPED: Locking down all financial allocations.")
         return {
             "authorized_payout": 0.0,
             "escrow_dispute_amount": gross_claim,
             "financial_context": "⚠️ CRITICAL PROTOCOL BREACH: Payout frozen by Medical Circuit Breaker.",
-            "breaker_checked": True, # <-- FIX: Tell the supervisor this node has finished!
+            "breaker_checked": True,
             "next_step": "FINISH"
         }
         
-    # If everything is clear, pass through seamlessly
     print("   -> Breaker Clear: Routing payload directly to final settlement execution.")
     return {
-        "breaker_checked": True, # <-- FIX: Tell the supervisor this node has finished!
+        "breaker_checked": True,
         "next_step": "FINISH"
     }
 
 def risk_grader_node(state: TrialState):
-    print("🧮 [Worker: Risk Grader] Computing stable deterministic threat matrix...")
+    print("[Worker: Risk Grader] Computing stable deterministic threat matrix...")
     
-    # Enforce strict system instructions and provide clear few-shot evaluation examples
     prompt = f"""
     You are an enterprise risk engine. Evaluate these metrics strictly according to these definitions:
     1. If there are line-item fee violations or overcharges -> output TIER: HIGH_FINANCIAL_RISK
@@ -204,14 +200,9 @@ def risk_grader_node(state: TrialState):
     "TIER: HIGH_FINANCIAL_RISK | REASON:"
     """
     
-    # Setting temperature to 0.0 strips the model's randomness, forcing it to be predictable
-    response = ollama.chat(
-        model='llama3.1', 
-        messages=[{'role': 'user', 'content': prompt}],
-        options={"temperature": 0.0} 
-    )
+    response = llm.invoke(prompt)
     return {
-        "triage_verdict": response['message']['content'].strip(),
+        "triage_verdict": response.content,
         "triage_checked": True,
         "next_step": "SUPERVISOR"
     }

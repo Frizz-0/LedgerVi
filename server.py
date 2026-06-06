@@ -19,8 +19,8 @@ from agents import (
 )
 
 # Use your session pooling URI here when connecting to Supabase production tracks
-DB_PARAMS = "dbname=trialguard_ledger user=postgres password=postgres host=localhost port=5432"
-# DB_PARAMS = ""
+# DB_PARAMS = "dbname=trialguard_ledger user=postgres password=postgres host=localhost port=5432"
+DB_PARAMS = "postgresql://postgres.xtofuvudnfmfnxunxfpq:bTJYcPRPx5BIXIQy@aws-0-eu-west-1.pooler.supabase.com:5432/postgres"
 
 def init_relational_database():
     try:
@@ -58,9 +58,9 @@ def init_relational_database():
         conn.commit()
         cur.close()
         conn.close()
-        print("💾 Permanent PostgreSQL storage interfaces fully synced.")
+        print("PostgreSQL storage fully synced.")
     except Exception as e:
-        print(f"⚠️ PostgreSQL engine unreachable ({e}). Fallback mode.")
+        print(f"PostgreSQL engine unreachable ({e}). Fallback mode.")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -237,7 +237,7 @@ async def ingest_claim(payload: ClaimIngestRequest, thread_id: str):
             metrics=query_aggregated_metrics()
         )
     except Exception as e:
-        print(f"🚨 INGESTION SERVER ERROR Traceback: {e}")
+        print(f"INGESTION SERVER ERROR Traceback: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.post("/api/claims/action", response_model=EnterpriseResponse)
@@ -282,7 +282,7 @@ async def signoff_claim(payload: HumanSignoffRequest, thread_id: str):
             cur.close()
             conn.close()
         except Exception as db_err: 
-            print(f"🚨 DATABASE WRITE FAILURE: {db_err}")
+            print(f"DATABASE WRITE FAILURE: {db_err}")
             
         return EnterpriseResponse(
             thread_id=thread_id, status=f"CLOSED_{payload.action}", claim_amount=state_view.get("claim_amount", 0.0), authorized_payout=payout_final, escrow_dispute=dispute_final, verdict=state_view.get("triage_verdict", ""),

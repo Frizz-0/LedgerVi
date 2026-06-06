@@ -14,7 +14,7 @@ class TrialGuardKnowledgeBase:
         self._seed_knowledge_base()
 
     def _seed_knowledge_base(self):
-        print("📦 Seeding TrialGuard Enterprise Knowledge Bases with Expanded Rulesets...")
+        print("Seeding TrialGuard Enterprise Knowledge Bases with Expanded Rulesets...")
         
         # 1. Comprehensive Medical/Regulatory Standards Collection Array
         med_rules = {
@@ -42,7 +42,7 @@ class TrialGuardKnowledgeBase:
             res = ollama.embeddings(model="llama3.1", prompt=doc)
             self.financial_collection.add(ids=[key], embeddings=[res["embedding"]], documents=[doc])
             
-        print("✅ Vector data streams securely indexed. 10 Core Enterprise Rules Live.")
+        print("Vector data streams securely indexed. 10 Core Enterprise Rules Live.")
 
     def query_medical(self, text: str) -> str:
         res = ollama.embeddings(model="llama3.1", prompt=text)
