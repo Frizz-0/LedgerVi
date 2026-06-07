@@ -21,7 +21,7 @@ class TrialGuardKnowledgeBase:
         self._seed_knowledge_base()
 
     def _seed_knowledge_base(self):
-        print("💾 Seeding TrialGuard Enterprise Knowledge Bases with Expanded Rulesets...")
+        print("Seeding TrialGuard Enterprise Knowledge Bases with Expanded Rulesets...")
         
         # 1. Comprehensive Medical/Regulatory Standards Collection Array
         med_rules = {
@@ -32,7 +32,6 @@ class TrialGuardKnowledgeBase:
             "med_550": "REG-550: Experimental therapies administered outside primary trial sites during acute life-threatening episodes are legally permitted only if a prior multi-disciplinary site-board waiver is attached to the patient file record."
         }
         
-        # 🛡️ FIXED: You can now pass documents directly. Chroma handles vector generation automatically!
         for key, doc in med_rules.items():
             self.medical_collection.add(ids=[key], documents=[doc])
 
@@ -45,23 +44,27 @@ class TrialGuardKnowledgeBase:
             "fin_450": "CAP-450: Intravenous compounding and specialized pharmacy formulation labor fees are strictly capped at a max-ceiling limit of £15,000 per subject admission block."
         }
         
-        # 🛡️ FIXED: Removed old ollama loop references
         for key, doc in fin_clauses.items():
             self.financial_collection.add(ids=[key], documents=[doc])
             
-        print("✅ Vector data streams securely indexed. 10 Core Enterprise Rules Live.")
+        print("Vector data streams securely indexed. 10 Core Enterprise Rules Live.")
 
     def query_medical(self, text: str) -> str:
-        # 🛡️ FIXED: Simply query by text string. Chroma computes the match seamlessly.
-        results = self.medical_collection.query(query_texts=[text], n_results=1)
-        return results["documents"][0][0] if results["documents"][0] else "No matching regulation found."
+
+        results = self.medical_collection.query(query_texts=[text], n_results=2)
+        if results["documents"] and results["documents"][0]:
+            # Join them together cleanly with a newline
+            return "\n".join(results["documents"][0])
+        return "No matching regulation found."
 
     def query_financial(self, text: str) -> tuple:
-        # 🛡️ FIXED: Simply query by text string
+        # Pull top 2 matches
         results = self.financial_collection.query(query_texts=[text], n_results=2)
-        if results["documents"][0]:
-            return (results["documents"][0][0], results["ids"][0][0]) if len(results["ids"][0]) > 0 else (results["documents"][0][0], "POLICY-UNKNOWN")
+        if results["documents"] and results["documents"][0]:
+            # Join the texts for the LLM context, and grab the primary rule ID
+            combined_context = "\n".join(results["documents"][0])
+            primary_id = results["ids"][0][0] if len(results["ids"][0]) > 0 else "POLICY-UNKNOWN"
+            return (combined_context, primary_id)
         return ("No matching contract clause found.", "POLICY-UNKNOWN")
-
 # Singleton instance instantiation
 trialguard_db = TrialGuardKnowledgeBase()
