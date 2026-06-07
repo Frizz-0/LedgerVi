@@ -20,10 +20,8 @@ from agents import (
     risk_grader_node
 )
 
-# Use your session pooling URI here when connecting to Supabase production tracks
-# DB_PARAMS = "dbname=trialguard_ledger user=postgres password=postgres host=localhost port=5432"
 load_dotenv()
-DB_PARAMS = "postgresql://postgres.xtofuvudnfmfnxunxfpq:bTJYcPRPx5BIXIQy@aws-0-eu-west-1.pooler.supabase.com:5432/postgres"
+DB_PARAMS = os.getenv("Postgres_URL", "")
 
 def init_relational_database():
     try:
@@ -76,7 +74,6 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 # GRAPH ROUTER SCHEMATICS
 builder = StateGraph(TrialState)
 
-# 1. Register all nodes into the pipeline schema space
 builder.add_node("ROUTER", ingestion_router_node)
 builder.add_node("cognitive_worker", cognitive_extractor_node)
 builder.add_node("supervisor", managing_director_supervisor_node)
@@ -86,10 +83,8 @@ builder.add_node("risk_worker", risk_grader_node)
 builder.add_node("circuit_breaker", medical_circuit_breaker_node)
 builder.add_node("human_breakpoint_barrier", lambda state: {})
 
-# 2. CRITICAL CORRECTION: Set the true entry point straight into the Traffic-Cop Router!
 builder.set_entry_point("ROUTER")
 
-# 3. Dynamic Conditional Route out of the Ingestion Router Node
 def runtime_entry_switchboard(state: TrialState):
     path = state.get("ingestion_routing_path", "HYBRID")
     if path == "COGNITIVE":
@@ -105,10 +100,8 @@ builder.add_conditional_edges("ROUTER", runtime_entry_switchboard, {
     "to_end": "human_breakpoint_barrier"
 })
 
-# 4. Connect the Cognitive Extractor safely straight back to the Supervisor
 builder.add_edge("cognitive_worker", "supervisor")
 
-# 5. Maintain standard supervisor orchestration loops
 def switchboard_router(state: TrialState):
     target = state["next_step"]
     if target == "RESEARCHER": return "to_med"
@@ -148,6 +141,14 @@ def query_aggregated_metrics() -> MetricsResponse:
         )
     except Exception:
         return MetricsResponse(total_claims_processed=0, total_payouts_authorized=0.0, total_capital_leakage_prevented=0.0, active_disputed_escrow=0.0)
+
+@app.get("/")
+async def root_health_check():
+    return {
+        "status": "ONLINE",
+        "engine": "TrialGuard Multi-Agent Underwriting Ledger System",
+        "version": "2.0"
+    }
 
 @app.get("/api/claims/metrics", response_model=MetricsResponse)
 async def get_live_metrics():
@@ -250,7 +251,6 @@ async def signoff_claim(payload: HumanSignoffRequest, thread_id: str):
         state_view = pipeline.get_state(config).values
         pipeline.update_state(config, {"approval_status": payload.action}, as_node="human_breakpoint_barrier")
         pipeline.invoke(None, config=config)
-        # pipeline.invoke(state_view, config=config)
         state_view = pipeline.get_state(config).values
         
         if payload.action == "ESCALATE":
@@ -279,7 +279,7 @@ async def signoff_claim(payload: HumanSignoffRequest, thread_id: str):
                 thread_id, state_view.get("trial_id"), state_view.get("patient_id"), state_view.get("patient_name"), state_view.get("patient_sex"), state_view.get("patient_age"), state_view.get("patient_cohort"),
                 state_view.get("patient_enrollment"), state_view.get("patient_incident_date"), state_view.get("clinical_history_summary"), state_view.get("invoice_isolation_fees"), state_view.get("invoice_labor_fees"),
                 state_view.get("invoice_medication_fees"), state_view.get("claim_amount"), payout_final, dispute_final, state_view.get("matched_rule_id"), state_view.get("matched_clause_id"), state_view.get("rag_confidence_percentage"), payload.action, 
-                state_view.get("raw_clause_text"), state_view.get("triage_verdict"), state_view.get("raw_rule_text") # 👈 Added tracking arguments
+                state_view.get("raw_clause_text"), state_view.get("triage_verdict"), state_view.get("raw_rule_text")
             ))
             conn.commit()
             cur.close()
@@ -292,7 +292,9 @@ async def signoff_claim(payload: HumanSignoffRequest, thread_id: str):
             patient_name=state_view.get("patient_name", ""), patient_sex=state_view.get("patient_sex", ""), patient_age=state_view.get("patient_age", 0), patient_cohort=state_view.get("patient_cohort", ""),
             patient_enrollment=state_view.get("patient_enrollment", ""), patient_incident_date=state_view.get("patient_incident_date", ""), patient_telemetry=state_view.get("patient_telemetry", "CLOSED"), clinical_history_summary=state_view.get("clinical_history_summary", ""),
             invoice_isolation_fees=state_view.get("invoice_isolation_fees", 0.0), invoice_labor_fees=state_view.get("invoice_labor_fees", 0.0), invoice_medication_fees=state_view.get("invoice_medication_fees", 0.0),
-            matched_rule_id=state_view.get("matched_rule_id", ""), matched_clause_id=state_view.get("matched_clause_id", ""), rag_confidence_percentage=state_view.get("rag_confidence_percentage", 0.0), metrics=query_aggregated_metrics()
+            matched_rule_id=state_view.get("matched_rule_id", "POLICY-UNKNOWN"), matched_clause_id=state_view.get("matched_clause_id", ""), 
+            raw_rule_text=state_view.get("raw_rule_text", ""), raw_clause_text=state_view.get("raw_clause_text", ""),
+            rag_confidence_percentage=state_view.get("rag_confidence_percentage", 0.0), metrics=query_aggregated_metrics()
         )
     except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
@@ -310,5 +312,4 @@ async def purge_ledger_record(thread_id: str, admin_signature: str):
     except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    # uvicorn.run(app, host="127.0.0.1", port=8000)
     uvicorn.run(app, host="0.0.0.0", port=10000)

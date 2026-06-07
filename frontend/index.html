@@ -30,13 +30,10 @@
 <body
     class="bg-zinc-950 text-zinc-100 min-h-screen font-mono antialiased selection:bg-zinc-200 selection:text-zinc-900">
 
-    <div class="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+    <div class="max-w-7xl mx-auto p-4 md:p-8 space-y-5">
 
         <header class="flex justify-between items-center pb-4 border-b border-zinc-900">
             <h1 class="text-base font-black tracking-[0.25em] text-zinc-100">LEDGERVI</h1>
-            <div id="statusLabel"
-                class="text-xs px-3 py-1 rounded-sm bg-zinc-950 border border-zinc-800 text-zinc-200 tracking-wider font-bold transition-all">
-                SYSTEM_IDLE</div>
         </header>
 
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -207,9 +204,16 @@
             <div
                 class="lg:col-span-6 bg-zinc-900/10 border border-zinc-900 p-5 rounded-sm flex flex-col justify-between shadow-md">
                 <div class="space-y-4 flex-1 flex flex-col">
-                    <span
-                        class="text-xs text-zinc-500 uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">Core
-                        Analytics Stream Output</span>
+                    <div class="grid grid-cols-2 gap-9">
+                        <span
+                            class="text-xs text-zinc-500 uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">
+                            Core Analytics Stream Output
+                        </span>
+                        <div id="statusLabel"
+                            class="text-xs px-3 py-1 rounded-sm bg-zinc-950 flex justify-between border border-zinc-800 text-zinc-200 tracking-wider font-bold transition-all justify-self-end w-fit">
+                            SYSTEM_IDLE
+                        </div>
+                    </div>
 
                     <div class="grid grid-cols-2 gap-4 text-xs">
                         <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-sm">
@@ -552,6 +556,8 @@
             const btn = document.getElementById("ingestBtn");
             btn.disabled = true; btn.innerText = "RUNNING COMPLIANCE GRAPH...";
             document.getElementById("statusLabel").innerText = "CORE_PROCESSING";
+            document.getElementById("statusLabel").className = "text-xs px-2.5 py-1 rounded-sm bg-emerald-950 text-emerald-200 border border-emerald-900 font-bold justify-self-end w-fit";
+
 
             const historyLogs = [];
             const rows = document.querySelectorAll(".history-row");
@@ -635,6 +641,8 @@
                 document.getElementById("ragClauseDisplay").innerText = data.raw_clause_text || "No baseline contract clause text returned.";
 
                 document.getElementById("statusLabel").innerText = "TRANSACTION_PAUSED";
+                document.getElementById("statusLabel").className = "text-xs px-2.5 py-1 rounded-sm bg-amber-950 text-amber-400 border border-amber-900 font-bold justify-self-end w-fit";
+
                 updateMetrics(data.metrics);
                 document.getElementById("actionPanel").classList.remove("hidden");
 
@@ -656,7 +664,7 @@
                     body: JSON.stringify({ action: action })
                 });
                 document.getElementById("statusLabel").innerText = "TRANSACTION_CLOSED";
-                document.getElementById("statusLabel").className = "text-xs px-2.5 py-1 rounded-sm bg-zinc-950 text-zinc-600 border border-zinc-900 font-bold";
+                document.getElementById("statusLabel").className = "text-xs px-3 py-1 rounded-sm bg-emerald-950 flex justify-between border border-emerald-800 text-emerald-200 tracking-wider font-bold transition-all justify-self-end w-fit";
                 await fetchMetrics(); await fetchHistory();
                 document.getElementById("actionPanel").classList.add("hidden");
             } catch (err) { alert("Action exception."); }
