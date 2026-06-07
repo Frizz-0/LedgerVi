@@ -21,7 +21,13 @@ from agents import (
 )
 
 load_dotenv()
-DB_PARAMS = f"dsn={os.getenv("Postgres_URL", "")}"
+DB_PARAMS = os.getenv("Postgres_URL")
+
+
+if DB_PARAMS:
+    print("API Key successfully loaded!")
+else:
+    print("Failed to load API Key. Check your .env file path.")
 
 def init_relational_database():
     try:
@@ -313,3 +319,5 @@ async def purge_ledger_record(thread_id: str, admin_signature: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=10000)
+    # uvicorn.run(app, host="127.0.0.1", port=8000)
+
