@@ -1,15 +1,10 @@
-# database.py
 import chromadb
-# Import Chroma's built-in lightweight open-source embedding utility engine
 from chromadb.utils import embedding_functions
 
 class TrialGuardKnowledgeBase:
     def __init__(self):
         # Initialize the persistent local client layout configuration
         self.chroma_client = chromadb.Client()
-        
-        # 🛡️ FIXED: Define a lightweight, cloud-safe embedding system tool
-        # This calculates text vectors inside the process without calling a local server!
         self.embedding_engine = embedding_functions.DefaultEmbeddingFunction()
         
         # Isolate medical regulations from financial contracts cleanly

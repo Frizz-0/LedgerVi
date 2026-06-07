@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
+from dotenv import load_dotenv
+import os
 
 from engine_state import TrialState, ClaimIngestRequest, HumanSignoffRequest, MetricsResponse, EnterpriseResponse
 from agents import (
@@ -20,6 +22,7 @@ from agents import (
 
 # Use your session pooling URI here when connecting to Supabase production tracks
 # DB_PARAMS = "dbname=trialguard_ledger user=postgres password=postgres host=localhost port=5432"
+load_dotenv()
 DB_PARAMS = "postgresql://postgres.xtofuvudnfmfnxunxfpq:bTJYcPRPx5BIXIQy@aws-0-eu-west-1.pooler.supabase.com:5432/postgres"
 
 def init_relational_database():
