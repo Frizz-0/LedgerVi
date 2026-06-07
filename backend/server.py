@@ -21,7 +21,7 @@ from agents import (
 )
 
 load_dotenv()
-DB_PARAMS = os.getenv("Postgres_URL", "")
+DB_PARAMS = f"dsn={os.getenv("Postgres_URL", "")}"
 
 def init_relational_database():
     try:
