@@ -3,27 +3,23 @@ from chromadb.utils import embedding_functions
 
 class TrialGuardKnowledgeBase:
     def __init__(self):
-        # Initialize the persistent local client layout configuration
         self.chroma_client = chromadb.Client()
         self.embedding_engine = embedding_functions.DefaultEmbeddingFunction()
-        
-        # Isolate medical regulations from financial contracts cleanly
-        # Pass the embedding engine into the collection initialization so math runs automatically
+
         self.medical_collection = self.chroma_client.get_or_create_collection(
-            name="medical_regs", 
+            name="medical_regs",
             embedding_function=self.embedding_engine
         )
         self.financial_collection = self.chroma_client.get_or_create_collection(
-            name="financial_contracts", 
+            name="financial_contracts",
             embedding_function=self.embedding_engine
         )
-        
+
         self._seed_knowledge_base()
 
     def _seed_knowledge_base(self):
         print("Seeding TrialGuard Enterprise Knowledge Bases with Expanded Rulesets...")
-        
-        # 1. Comprehensive Medical/Regulatory Standards Collection Array
+
         med_rules = {
             "med_802": "REG-802: Severe expanding skin lesions, acute urticaria, or systemic anaphylaxis during trial phases require high-priority specialist escalation and immediate isolation protocols.",
             "med_915": "REG-915: Administration of unapproved auxiliary macrolide compounds or non-protocol antibiotics requires a mandatory 24-hour continuous telemetry monitoring log.",
@@ -31,11 +27,10 @@ class TrialGuardKnowledgeBase:
             "med_112": "REG-112: Sudden baseline heart rate variances exceeding +/-30% following delivery of active max compounds require an immediate cardiac enzyme panel and emergency intensive care tracking.",
             "med_550": "REG-550: Experimental therapies administered outside primary trial sites during acute life-threatening episodes are legally permitted only if a prior multi-disciplinary site-board waiver is attached to the patient file record."
         }
-        
+
         for key, doc in med_rules.items():
             self.medical_collection.add(ids=[key], documents=[doc])
 
-        # 2. Comprehensive Financial/Underwriting Contract Clause Collection Array
         fin_clauses = {
             "fin_100k": "MAX-CAP-100K: Private ward isolation and auxiliary compound claims are strictly capped at a ceiling of £100,000 per adverse event cycle. Any overage amount is non-reimbursable.",
             "fin_303": "POLICY-303: Standard outpatient specialist consultation fees and routine secondary lab assays during dynamic trials are covered up to a maximum of £5,000 per fiscal day token.",
@@ -43,28 +38,37 @@ class TrialGuardKnowledgeBase:
             "fin_990": "LIMIT-990: Claims submitted by offshore or cross-border trial sites are subject to a maximum currency conversion protection limit of 5% variance; currency fluctuations exceeding this threshold must be absorbed by the local host research clinic.",
             "fin_450": "CAP-450: Intravenous compounding and specialized pharmacy formulation labor fees are strictly capped at a max-ceiling limit of £15,000 per subject admission block."
         }
-        
+
         for key, doc in fin_clauses.items():
             self.financial_collection.add(ids=[key], documents=[doc])
-            
+
         print("Vector data streams securely indexed. 10 Core Enterprise Rules Live.")
 
-    def query_medical(self, text: str) -> str:
-
-        results = self.medical_collection.query(query_texts=[text], n_results=2)
+    def query_medical(self, text: str, n_results: int = 5) -> list:
+        """Returns top N candidate regulations as structured list for LLM reranking.
+        Returns: [{"id": "REG-802", "text": "REG-802: ..."}, ...]
+        """
+        results = self.medical_collection.query(query_texts=[text], n_results=n_results)
         if results["documents"] and results["documents"][0]:
-            # Join them together cleanly with a newline
-            return "\n".join(results["documents"][0])
-        return "No matching regulation found."
+            candidates = []
+            for doc in results["documents"][0]:
+                rule_id = doc.split(":")[0].strip() if ":" in doc else "REG-UNKNOWN"
+                candidates.append({"id": rule_id, "text": doc})
+            return candidates
+        return []
 
-    def query_financial(self, text: str) -> tuple:
-        # Pull top 2 matches
-        results = self.financial_collection.query(query_texts=[text], n_results=2)
+    def query_financial(self, text: str, n_results: int = 3) -> tuple:
+        """Returns (combined_text, default_clause_id, raw_docs_list).
+        raw_docs_list is kept separate so callers can filter to only applied clauses.
+        """
+        results = self.financial_collection.query(query_texts=[text], n_results=n_results)
         if results["documents"] and results["documents"][0]:
-            # Join the texts for the LLM context, and grab the primary rule ID
-            combined_context = "\n".join(results["documents"][0])
-            primary_id = results["ids"][0][0] if len(results["ids"][0]) > 0 else "POLICY-UNKNOWN"
-            return (combined_context, primary_id)
-        return ("No matching contract clause found.", "POLICY-UNKNOWN")
-# Singleton instance instantiation
+            docs = results["documents"][0]
+            combined_context = "\n".join(docs)
+            first_doc = docs[0]
+            primary_id = first_doc.split(":")[0].strip() if ":" in first_doc else "POLICY-UNKNOWN"
+            return (combined_context, primary_id, docs)
+        return ("No matching contract clause found.", "POLICY-UNKNOWN", [])
+
+# Singleton instance
 trialguard_db = TrialGuardKnowledgeBase()

@@ -1,6 +1,6 @@
 # engine_state.py
 from pydantic import BaseModel, Field
-from typing import TypedDict, List
+from typing import TypedDict, List, Optional
 
 class InvoiceBreakdown(BaseModel):
     isolation_ward_fees: float = Field(..., example=90000.0)
@@ -27,11 +27,9 @@ class TrialState(TypedDict):
     trial_id: str
     patient_id: str
     procedure_notes: str
-    
-    # Will hold "HYBRID" or "COGNITIVE"
     ingestion_routing_path: str
-    
-    # Demographics & Trends
+
+    # Demographics
     patient_name: str
     patient_sex: str
     patient_age: int
@@ -39,32 +37,34 @@ class TrialState(TypedDict):
     patient_enrollment: str
     patient_incident_date: str
     patient_telemetry: str
-    clinical_history_summary: str # Compiled timeline string for prompt/UI
+    clinical_history_summary: str
     patient_prior_events: str
     raw_clause_text: str
-    raw_rule_text:str 
-    
-    # Financial Matrix Slices
+    raw_rule_text: str
+
+    # Financial
     claim_amount: float
     authorized_payout: float
     escrow_dispute_amount: float
     invoice_isolation_fees: float
     invoice_labor_fees: float
     invoice_medication_fees: float
-    
-    # Vector RAG Trust Metrics
+
+    # RAG Trust Metrics
     matched_rule_id: str
     matched_clause_id: str
     rag_confidence_percentage: float
-    
-    # Worker Context Strings
+
+    # Worker Context
     medical_context: str
     financial_context: str
     triage_verdict: str
-    
+
+    # Gate Flags
     medical_checked: bool
     financial_checked: bool
     triage_checked: bool
+    breaker_checked: bool
     approval_status: str
     next_step: str
 
@@ -90,8 +90,7 @@ class EnterpriseResponse(BaseModel):
     authorized_payout: float
     escrow_dispute: float
     verdict: str
-    
-    # Patient Profile
+
     patient_name: str
     patient_sex: str
     patient_age: int
@@ -100,16 +99,14 @@ class EnterpriseResponse(BaseModel):
     patient_incident_date: str
     patient_telemetry: str
     clinical_history_summary: str
-    
-    # Itemized Breakdown
+
     invoice_isolation_fees: float
     invoice_labor_fees: float
     invoice_medication_fees: float
-    
-    # Trust Scores
+
     matched_rule_id: str
     matched_clause_id: str
     rag_confidence_percentage: float
     metrics: MetricsResponse
-    raw_rule_text:str   
+    raw_rule_text: str
     raw_clause_text: str
