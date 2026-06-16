@@ -8,6 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="Lvi_logo0_s.png">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&display=swap');
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -18,120 +24,168 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #2a2a45;
+            background: #1e1e2f;
             border-radius: 2px;
+            border: 1px solid #2e2e4f;
         }
 
         ::-webkit-scrollbar-thumb:hover {
             background: #3f3f46;
         }
+
+        .glow-overlay {
+            position: relative;
+        }
+
+        .glow-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05), transparent 70%);
+            pointer-events: none;
+        }
+
+        @keyframes pulse-subtle {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .terminal-cursor {
+            animation: pulse-subtle 1s infinite;
+        }
     </style>
 </head>
 
 <body
-    class="bg-zinc-950 text-zinc-100 min-h-screen font-mono antialiased selection:bg-zinc-200 selection:text-zinc-900">
+    class="bg-zinc-950 text-zinc-100 min-h-screen antialiased selection:bg-zinc-200 selection:text-zinc-900 glow-overlay">
 
-    <div class="max-w-7xl mx-auto p-4 md:p-8 space-y-5">
+    <div class="max-w-7xl mx-auto p-4 md:p-8 space-y-6 relative z-10">
 
-        <header class="flex justify-between items-center pb-4 border-b border-zinc-900">
-            <h1 class="text-base font-black tracking-[0.25em] text-zinc-100">LEDGERVI</h1>
+        <header class="flex justify-between items-center pb-4 border-b border-zinc-900/80">
+            <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 bg-blue-500 rounded-none shadow-[0_0_10px_rgba(59,130,246,0.6)]"></div>
+                <h1 class="text-xs font-black tracking-[0.4em] text-zinc-400">LEDGERVI <span
+                        class="text-zinc-100 font-bold"></span></h1>
+            </div>
+            <!-- <div class="text-[10px] text-zinc-600 tracking-wider">SECURE NODE NETWORK // ONLINE</div> -->
         </header>
 
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
-                <span class="text-[10px] text-zinc-500 uppercase tracking-widest block font-bold">Ledger Logs</span>
-                <div id="metricCount" class="text-2xl font-light text-zinc-100 mt-1 tracking-tight">0</div>
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+                class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-none shadow-sm relative overflow-hidden group hover:border-zinc-800 transition-all">
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-zinc-800 to-transparent"></div>
+                <span class="text-[9px] text-zinc-500 uppercase tracking-widest block font-bold">Ledger Logs</span>
+                <div id="metricCount" class="text-2xl font-light text-zinc-100 mt-1 tracking-tight font-mono">0</div>
             </div>
-            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
-                <span class="text-[10px] text-emerald-500 uppercase tracking-widest block font-bold">Authorized
+            <div
+                class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-none shadow-sm relative overflow-hidden group hover:border-emerald-950 transition-all">
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-emerald-500/30 to-transparent">
+                </div>
+                <span class="text-[9px] text-emerald-500 uppercase tracking-widest block font-bold">Authorized
                     Capital</span>
-                <div id="metricPayout" class="text-2xl font-mono text-emerald-100 mt-1 tracking-tight">£0.00</div>
+                <div id="metricPayout" class="text-2xl font-mono text-emerald-400 mt-1 tracking-tight">£0.00</div>
             </div>
-            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
-                <span class="text-[10px] text-slate-500 uppercase tracking-widest block font-bold">Leakage
+            <div
+                class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-none shadow-sm relative overflow-hidden group hover:border-blue-950 transition-all">
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-blue-500/30 to-transparent">
+                </div>
+                <span class="text-[9px] text-blue-400 uppercase tracking-widest block font-bold">Leakage
                     Mitigated</span>
-                <div id="metricLeakage" class="text-2xl font-mono text-slate-200 mt-1 tracking-tight">£0.00</div>
+                <div id="metricLeakage" class="text-2xl font-mono text-blue-400 mt-1 tracking-tight">£0.00</div>
             </div>
-            <div class="bg-zinc-900/20 border border-zinc-900/60 p-5 rounded-sm">
-                <span class="text-[10px] text-rose-500 uppercase tracking-widest block font-bold">Active Escrow
+            <div
+                class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-none shadow-sm relative overflow-hidden group hover:border-rose-950 transition-all">
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-rose-500/30 to-transparent">
+                </div>
+                <span class="text-[9px] text-rose-500 uppercase tracking-widest block font-bold">Active Escrow
                     Holds</span>
-                <div id="metricEscrow" class="text-2xl font-mono text-rose-100 mt-1 tracking-tight">£0.00</div>
+                <div id="metricEscrow" class="text-2xl font-mono text-rose-400 mt-1 tracking-tight">£0.00</div>
             </div>
         </section>
 
         <section
-            class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-zinc-900/10 border border-zinc-900 p-6 rounded-sm shadow-md">
-            <div class="lg:col-span-4 bg-zinc-950/40 p-3 border border-zinc-900/80 space-y-2 rounded-sm text-[10px]">
-                <span class="text-xs text-blue-200 block uppercase font-bold border-b border-zinc-900 pb-1.5">Patient
+            class="grid grid-cols-1 lg:grid-cols-12 gap-5 bg-zinc-900/10 border border-zinc-900 p-5 rounded-none shadow-md">
+
+            <div
+                class="lg:col-span-4 bg-zinc-950/60 p-4 border border-zinc-900/80 space-y-3 rounded-none text-[10px] relative">
+                <span
+                    class="text-xs text-zinc-400 block uppercase font-bold tracking-wider border-b border-zinc-900 pb-2">Patient
                     Profile</span>
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-3 gap-2.5">
                     <div class="col-span-2">
-                        <label class="text-zinc-600 block mb-0.5">Full Name</label>
+                        <label class="text-zinc-600 block mb-1 uppercase font-bold text-[9px]">Full Name</label>
                         <input type="text" id="inputName" value="Geordi La Forge"
-                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                            class="w-full bg-zinc-950 border border-zinc-800/80 p-2 text-zinc-300 font-bold focus:outline-none focus:border-zinc-700 focus:bg-zinc-900/20 transition-all">
                     </div>
                     <div>
-                        <label class="text-zinc-600 block mb-0.5">Age</label>
+                        <label class="text-zinc-600 block mb-1 uppercase font-bold text-[9px]">Age</label>
                         <input type="number" id="inputAge" value="35"
-                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                            class="w-full bg-zinc-950 border border-zinc-800/80 p-2 text-zinc-300 font-bold focus:outline-none focus:border-zinc-700 focus:bg-zinc-900/20 transition-all">
                     </div>
                     <div>
-                        <label class="text-zinc-600 block mb-0.5">Sex</label>
+                        <label class="text-zinc-600 block mb-1 uppercase font-bold text-[9px]">Sex</label>
                         <select id="inputSex"
-                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                            class="w-full bg-zinc-950 border border-zinc-800/80 p-2 text-zinc-300 font-bold focus:outline-none focus:border-zinc-700 focus:bg-zinc-900/20 transition-all">
                             <option value="FEMALE">FEMALE</option>
-                            <option value="MALE">MALE</option>
+                            <option value="MALE" selected>MALE</option>
                             <option value="OTHERS">OTHERS</option>
                         </select>
                     </div>
                     <div class="col-span-2">
-                        <label class="text-zinc-600 block mb-0.5">Enrollment Date</label>
+                        <label class="text-zinc-600 block mb-1 uppercase font-bold text-[9px]">Enrollment Date</label>
                         <input type="text" id="inputEnrollment" value="15/01/2026"
-                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                            class="w-full bg-zinc-950 border border-zinc-800/80 p-2 text-zinc-300 font-bold focus:outline-none focus:border-zinc-700 focus:bg-zinc-900/20 transition-all">
                     </div>
                     <div class="col-span-3">
-                        <label class="text-zinc-600 block mb-0.5">Trial Cohort Segment</label>
+                        <label class="text-zinc-600 block mb-1 uppercase font-bold text-[9px]">Trial Cohort
+                            Segment</label>
                         <input type="text" id="inputCohort" value="Arm-A (High-Density Compound Injections)"
-                            class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
+                            class="w-full bg-zinc-950 border border-zinc-800/80 p-2 text-zinc-300 font-bold focus:outline-none focus:border-zinc-700 focus:bg-zinc-900/20 transition-all">
                     </div>
                 </div>
             </div>
 
             <div
-                class="lg:col-span-4 bg-zinc-950/40 p-4 border-2 border-zinc-800/80 space-y-3 rounded-sm relative group hover:border-zinc-700 transition-colors">
-                <div
-                    class="absolute -top-2 left-3 bg-zinc-950 px-2 text-[8px] text-blue-400 font-bold uppercase tracking-widest">
-                    CRITICAL LEDGER VALUES *</div>
-                <span class="text-xs text-blue-200 block uppercase font-bold border-b border-zinc-900 pb-1.5">Invoice
+                class="lg:col-span-4 bg-zinc-950/60 p-4 border border-zinc-900/80 space-y-3 rounded-none relative group transition-colors">
+                <span
+                    class="text-xs text-zinc-400 block uppercase font-bold tracking-wider border-b border-zinc-900 pb-2">Invoice
                     Breakdown</span>
                 <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Isolation *</label>
+                        <label class="text-[9px] text-zinc-500 block mb-1 uppercase font-bold">Isolation *</label>
                         <input type="number" id="feeIso" value="10000"
-                            class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
+                            class="w-full bg-zinc-950 border border-zinc-800 p-2 text-xs font-mono font-bold text-zinc-200 focus:outline-none focus:border-blue-500/50 rounded-none transition-all">
                     </div>
                     <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Labor *</label>
+                        <label class="text-[9px] text-zinc-500 block mb-1 uppercase font-bold">Labor *</label>
                         <input type="number" id="feeLabor" value="25000"
-                            class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
+                            class="w-full bg-zinc-950 border border-zinc-800 p-2 text-xs font-mono font-bold text-zinc-200 focus:outline-none focus:border-blue-500/50 rounded-none transition-all">
                     </div>
                     <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Aux Meds *</label>
+                        <label class="text-[9px] text-zinc-500 block mb-1 uppercase font-bold">Aux Meds *</label>
                         <input type="number" id="feeMed" value="32000"
-                            class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
+                            class="w-full bg-zinc-950 border border-zinc-800 p-2 text-xs font-mono font-bold text-zinc-200 focus:outline-none focus:border-blue-500/50 rounded-none transition-all">
                     </div>
                     <div class="col-span-3 pt-1">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Thread Key
+                                <label class="text-[9px] text-zinc-500 block mb-1 uppercase font-bold">Thread Key
                                     *</label>
                                 <input type="text" id="threadId" value="tx_ref_9002"
-                                    class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-bold text-blue-300 focus:outline-none focus:border-blue-500 rounded-sm">
+                                    class="w-full bg-zinc-950 border border-zinc-800 p-2 text-xs font-bold text-blue-400 focus:outline-none focus:border-blue-500 rounded-none transition-all">
                             </div>
                             <div>
-                                <label class="text-[10px] text-zinc-500 block mb-1 uppercase">Gross Total</label>
+                                <label class="text-[9px] text-zinc-600 block mb-1 uppercase font-bold">Gross
+                                    Total</label>
                                 <input type="number" id="claimAmount" value="67000"
-                                    class="w-full bg-zinc-950 border border-zinc-900 p-2 text-xs text-emerald-400 font-bold focus:outline-none"
+                                    class="w-full bg-zinc-900/40 border border-zinc-900 p-2 text-xs text-zinc-400 font-bold font-mono focus:outline-none"
                                     disabled>
                             </div>
                         </div>
@@ -140,137 +194,156 @@
             </div>
 
             <div
-                class="lg:col-span-4 bg-zinc-950/40 p-4 border border-zinc-900/80 flex flex-col justify-between rounded-sm">
+                class="lg:col-span-4 bg-zinc-950/60 p-4 border border-zinc-900/80 flex flex-col justify-between rounded-none">
                 <div class="space-y-2">
                     <span
-                        class="text-xs text-blue-200 block uppercase font-bold border-b border-zinc-900 pb-1.5">Longitudinal
+                        class="text-xs text-zinc-400 block uppercase font-bold tracking-wider border-b border-zinc-900 pb-2">Longitudinal
                         History Logs</span>
-                    <div class="space-y-2 max-h-[96px] overflow-y-auto pr-1" id="historyInputContainer">
+                    <div class="space-y-2 max-h-[105px] overflow-y-auto pr-1" id="historyInputContainer">
                         <div class="grid grid-cols-12 gap-1.5 history-row items-center">
                             <input type="text" placeholder="Date"
-                                class="col-span-3 bg-zinc-900 border border-zinc-800 px-1 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                class="col-span-3 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none font-mono"
                                 value="10/02/2026">
                             <input type="text" placeholder="Sev"
-                                class="col-span-2 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                class="col-span-2 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none"
                                 value="Grade 1">
                             <input type="text" placeholder="Description"
-                                class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                class="col-span-5 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none"
                                 value="Mild Fatigue">
                             <button onclick="removeHistoryRow(this)"
-                                class="col-span-2 text-[12px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">[X]</button>
+                                class="col-span-2 text-[10px] text-rose-500/80 hover:text-rose-400 font-bold uppercase transition-colors text-center">[X]</button>
                         </div>
                         <div class="grid grid-cols-12 gap-1.5 history-row items-center">
                             <input type="text" placeholder="Date"
-                                class="col-span-3 bg-zinc-900 border border-zinc-800 px-1 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                class="col-span-3 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none font-mono"
                                 value="18/05/2026">
                             <input type="text" placeholder="Sev"
-                                class="col-span-2 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                class="col-span-2 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none"
                                 value="Grade 2">
                             <input type="text" placeholder="Description"
-                                class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
+                                class="col-span-5 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none"
                                 value="Mild Headache">
                             <button onclick="removeHistoryRow(this)"
-                                class="col-span-2 text-[12px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">[X]</button>
+                                class="col-span-2 text-[12px] text-rose-500/80 hover:text-rose-400 font-bold uppercase transition-colors text-center">[X]</button>
                         </div>
                     </div>
                 </div>
                 <button onclick="addNewHistoryRow()"
-                    class="text-[10px] uppercase tracking-wider text-blue-400 hover:text-blue-300 text-left pt-2 font-bold">+
+                    class="text-[9px] uppercase tracking-wider text-zinc-500 hover:text-zinc-300 text-left pt-2 font-bold transition-colors">+
                     Append History Row</button>
             </div>
         </section>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
             <div
-                class="lg:col-span-6 bg-zinc-900/10 border-2 border-zinc-800 p-5 rounded-sm flex flex-col justify-between shadow-md relative group hover:border-zinc-700 transition-colors">
-                <div
-                    class="absolute -top-2 left-4 bg-zinc-950 px-2 text-[8px] text-blue-400 font-bold uppercase tracking-widest">
-                    CRITICAL UNSTRUCTURED DATA ENTRY *</div>
-                <div class="space-y-2 flex-1 flex flex-col">
+                class="lg:col-span-6 bg-zinc-900/10 border border-zinc-900 p-5 rounded-none flex flex-col justify-between shadow-md relative group hover:border-zinc-800 transition-all">
+                <div class="space-y-3 flex-1 flex flex-col">
                     <span
-                        class="text-xs text-zinc-400 uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">Doctor's
-                        Clinical Activity Records Note Narrative *</span>
+                        class="text-xs text-zinc-400 pdf-text-fix uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">Clinical
+                        Narrative Input</span>
                     <textarea id="procedureNotes"
-                        class="w-full flex-1 min-h-[150px] bg-zinc-950 border-2 border-zinc-800 p-3 rounded-sm text-xs text-zinc-100 focus:outline-none focus:border-blue-500 resize-none font-sans leading-relaxed tracking-wide">Subject reported for standard follow-up diagnostics. Completed routine secondary lab assays alongside deep intra-venous compounding formulation labor adjustments. All baseline clinical parameters remained fully within expected thresholds at release.</textarea>
+                        class="w-full flex-1 min-h-[175px] bg-zinc-950 border border-zinc-900 p-3 rounded-none text-xs text-zinc-300 focus:outline-none focus:border-zinc-700 resize-none leading-relaxed font-sans tracking-wide">Subject reported for standard follow-up diagnostics. Completed routine secondary lab assays alongside deep intra-venous compounding formulation labor adjustments. All baseline clinical parameters remained fully within expected thresholds at release.</textarea>
                 </div>
+
+                <div class="mt-4 bg-zinc-950 p-3 border border-zinc-900/80 text-[10px] text-zinc-500 font-mono hidden max-h-[75px] overflow-y-auto"
+                    id="terminalTrace">
+                    <div class="text-blue-500/80">&gt;&gt; Initializing LangGraph context registers...</div>
+                    <div id="terminalLogDynamic"></div>
+                </div>
+
                 <button id="ingestBtn" onclick="runIngestPipeline()"
-                    class="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold py-3 text-xs uppercase tracking-widest transition-all mt-4">
+                    class="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-black py-3.5 text-xs uppercase tracking-[0.2em] transition-all mt-4 border border-transparent active:scale-[0.99]">
                     Process Pipeline Turn
                 </button>
             </div>
 
             <div
-                class="lg:col-span-6 bg-zinc-900/10 border border-zinc-900 p-5 rounded-sm flex flex-col justify-between shadow-md">
+                class="lg:col-span-6 bg-zinc-900/10 border border-zinc-900 p-5 rounded-none flex flex-col justify-between shadow-md">
                 <div class="space-y-4 flex-1 flex flex-col">
-                    <div class="grid grid-cols-2 gap-9">
-                        <span
-                            class="text-xs text-zinc-500 uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">Core
-                            Analytics Stream Output</span>
+                    <div class="flex justify-between items-center border-b border-zinc-900 pb-2">
+                        <span class="text-xs text-zinc-400 uppercase font-bold tracking-wider block">Core Analytics
+                            Stream</span>
                         <div id="statusLabel"
-                            class="text-xs px-3 py-1 rounded-sm bg-zinc-950 flex justify-between border border-zinc-800 text-zinc-200 tracking-wider font-bold transition-all justify-self-end w-fit">
+                            class="text-[9px] px-2.5 py-0.5 border text-zinc-400 bg-zinc-950 border-zinc-800 uppercase tracking-widest font-bold transition-all rounded-none">
                             SYSTEM_IDLE</div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 text-xs">
-                        <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-sm">
-                            <span class="text-[10px] text-zinc-500 uppercase block font-bold">Authorized Settlement
-                                Base</span>
-                            <div id="ledgerPayout" class="text-xl font-mono text-zinc-100 mt-0.5">£0.00</div>
+                        <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-none relative">
+                            <div class="absolute left-0 top-0 h-full w-[2px] bg-emerald-500"></div>
+                            <span class="text-[9px] text-zinc-500 uppercase block font-bold tracking-wider">Authorized
+                                Settlement Base</span>
+                            <div id="ledgerPayout" class="text-2xl font-mono text-zinc-100 mt-1 font-bold">£0.00</div>
                         </div>
-                        <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-sm">
-                            <span class="text-[10px] text-zinc-500 uppercase block font-bold">Escrow Mitigation
-                                Hold</span>
-                            <div id="ledgerDispute" class="text-xl font-mono text-zinc-300 mt-0.5">£0.00</div>
+                        <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-none relative">
+                            <div class="absolute left-0 top-0 h-full w-[2px] bg-zinc-700"></div>
+                            <span class="text-[9px] text-zinc-500 uppercase block font-bold tracking-wider">Escrow
+                                Mitigation Hold</span>
+                            <div id="ledgerDispute" class="text-2xl font-mono text-zinc-400 mt-1 font-bold">£0.00</div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2 bg-zinc-950 p-2.5 border border-zinc-900 text-xs">
-                        <div><span class="text-zinc-600 block text-[9px] uppercase font-bold">Matched Reg ID</span><span
-                                id="trustReg" class="text-zinc-300 font-bold">--</span></div>
-                        <div><span class="text-zinc-600 block text-[9px] uppercase font-bold">Matched Clause
-                                ID</span><span id="trustClause" class="text-zinc-300 font-bold">--</span></div>
-                        <div><span class="text-zinc-600 block text-[9px] uppercase font-bold">RAG Confidence
-                                Vector</span><span id="trustScore" class="text-zinc-400 font-bold">--</span></div>
+                    <div class="grid grid-cols-3 gap-2 bg-zinc-950/80 p-3 border border-zinc-900 text-[10px]">
+                        <div>
+                            <span
+                                class="text-zinc-600 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Matched
+                                Reg ID</span>
+                            <span id="trustReg" class="text-zinc-400 font-bold font-mono">--</span>
+                        </div>
+                        <div>
+                            <span
+                                class="text-zinc-600 block text-[9px] uppercase font-bold tracking-wider mb-0.5">Matched
+                                Clause ID</span>
+                            <span id="trustClause" class="text-blue-400 font-bold font-mono">--</span>
+                        </div>
+                        <div>
+                            <span class="text-zinc-600 block text-[9px] uppercase font-bold tracking-wider mb-0.5">RAG
+                                Confidence Vector</span>
+                            <span id="trustScore" class="text-zinc-400 font-bold font-mono">--</span>
+                        </div>
                     </div>
 
                     <div class="flex-1 flex flex-col">
                         <div id="verdictDisplay"
-                            class="bg-zinc-950/60 border border-zinc-900 text-xs text-slate-300 p-5 text-center min-h-[64px] max-h-[82px] overflow-y-auto rounded-sm border transition-all font-mono">
-                            [ Awaiting pipeline initialization... ]</div>
+                            class="bg-zinc-950/40 border border-zinc-900 text-xs text-zinc-500 p-4 min-h-[64px] max-h-[82px] overflow-y-auto rounded-none border font-mono transition-all">
+                            [ Awaiting pipeline initialization parameters... ]</div>
                     </div>
-                    <div class="bg-zinc-950 p-2.5 border border-zinc-900 text-xs rounded-sm mt-2">
+
+                    <div class="bg-zinc-950 p-2.5 border border-zinc-900 text-xs rounded-none">
                         <details class="group">
                             <summary
-                                class="text-[10px] text-blue-400 uppercase font-bold tracking-wider cursor-pointer list-none flex justify-between items-center select-none">
-                                <span> View Matched Source Regulatory & Clause </span>
-                                <span class="group-open:rotate-180 transition-transform duration-200">▼</span>
+                                class="text-[9px] text-blue-400 uppercase font-bold tracking-wider cursor-pointer list-none flex justify-between items-center select-none">
+                                <span>View Matched Source Regulatory & Clause Data Contexts</span>
+                                <span
+                                    class="group-open:rotate-180 transition-transform duration-200 text-zinc-600 text-[8px]">▼</span>
                             </summary>
-                            <div class="mt-2 border-t border-zinc-900 pt-2 space-y-3 font-sans">
+                            <div class="mt-2 border-t border-zinc-900 pt-2.5 space-y-3 font-sans">
                                 <div>
                                     <span
-                                        class="text-[9px] text-amber-500 font-mono font-bold block uppercase tracking-wider mb-1">Rule
+                                        class="text-[9px] text-amber-500/80 font-mono font-bold block uppercase tracking-wider mb-1">Rule
                                         Context:</span>
-                                    <div class="text-[11px] text-zinc-400 italic leading-relaxed pl-2 border-l-2 border-amber-900/60"
+                                    <div class="text-[11px] text-zinc-400 italic leading-relaxed pl-2.5 border-l-2 border-amber-900/60 font-mono"
                                         id="ragRuleDisplay">Awaiting pipeline execution vector matches...</div>
                                 </div>
                                 <div>
                                     <span
-                                        class="text-[9px] text-blue-400 font-mono font-bold block uppercase tracking-wider mb-1">Clause
+                                        class="text-[9px] text-blue-500/80 font-mono font-bold block uppercase tracking-wider mb-1">Clause
                                         Context:</span>
-                                    <div class="text-[11px] text-zinc-400 italic leading-relaxed pl-2 border-l-2 border-blue-900/60"
+                                    <div class="text-[11px] text-zinc-400 italic leading-relaxed pl-2.5 border-l-2 border-blue-900/60 font-mono"
                                         id="ragClauseDisplay">Awaiting pipeline execution vector matches...</div>
                                 </div>
                             </div>
                         </details>
                     </div>
 
-                    <div id="actionPanel" class="hidden mt-3 pt-3 border-t border-zinc-900">
-                        <div class="grid grid-cols-2 gap-4">
+                    <div id="actionPanel" class="hidden mt-2 pt-2 border-t border-zinc-900/60">
+                        <div class="grid grid-cols-2 gap-3">
                             <button onclick="commitHumanAction('APPROVE')"
-                                class="bg-zinc-800 hover:bg-green-700 text-zinc-100 text-xs font-bold py-3 border border-zinc-700 uppercase tracking-wider transition-colors">Authorize
+                                class="bg-zinc-900 hover:bg-emerald-950/40 hover:text-emerald-400 text-zinc-200 text-xs font-bold py-3 border border-zinc-800 hover:border-emerald-900 uppercase tracking-widest transition-all active:scale-[0.98]">Authorize
                                 Base</button>
                             <button onclick="commitHumanAction('ESCALATE')"
-                                class="bg-zinc-950 border border-zinc-800 hover:bg-amber-900 text-zinc-400 hover:text-zinc-200 text-xs font-bold py-3 uppercase tracking-wider transition-colors">Escalate
+                                class="bg-zinc-950 border border-zinc-900 hover:bg-rose-950/30 hover:text-rose-400 text-zinc-500 text-xs font-bold py-3 border-zinc-800 hover:border-rose-900 uppercase tracking-widest transition-all active:scale-[0.98]">Escalate
                                 Legal</button>
                         </div>
                     </div>
@@ -278,46 +351,48 @@
             </div>
         </main>
 
-        <div class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-sm text-xs shadow-inner">
+        <div class="bg-zinc-900/10 border border-zinc-900 p-4 rounded-none text-xs shadow-inner">
             <span
-                class="text-xs font-bold text-blue-200 uppercase tracking-wider block border-b border-zinc-900 pb-2">Active
-                Summary</span>
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 pt-3 text-zinc-400">
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Subject Label</span><span
-                        id="cardName" class="text-zinc-300 font-bold">--</span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Biological Sex</span><span
-                        id="cardSex" class="text-zinc-300 font-bold">--</span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Age Parameter</span><span
-                        id="cardAge" class="text-zinc-300 font-bold">--</span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Active Cohort</span><span
-                        id="cardCohort" class="text-zinc-300 font-bold break-words block">--</span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Enrollment Date</span><span
-                        id="cardEnrollment">--</span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Telemetry State</span><span
-                        id="cardTelemetry" class="text-zinc-600 font-bold">STANDBY</span></div>
+                class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block border-b border-zinc-900 pb-2">Active
+                Transaction Snapshot Summary</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 pt-3 text-zinc-500">
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Subject Label</span><span
+                        id="cardName" class="text-zinc-300 font-bold font-mono">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Biological Sex</span><span
+                        id="cardSex" class="text-zinc-400 font-mono">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Age Parameter</span><span
+                        id="cardAge" class="text-zinc-400 font-mono">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Active Cohort</span><span
+                        id="cardCohort" class="text-zinc-400 font-mono block truncate max-w-[120px]">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Enrollment Date</span><span
+                        id="cardEnrollment" class="font-mono">--</span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Telemetry State</span><span
+                        id="cardTelemetry" class="text-zinc-600 font-bold font-mono tracking-wider">STANDBY</span></div>
                 <div class="col-span-2 sm:col-span-4 lg:col-span-1"><span
-                        class="text-[9px] text-zinc-600 block uppercase font-bold">Longitudinal Stream</span><span
-                        id="cardHistory" class="text-zinc-400 block break-words">--</span></div>
+                        class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Longitudinal
+                        Stream</span><span id="cardHistory"
+                        class="text-zinc-500 block truncate font-sans max-w-[150px]">--</span></div>
             </div>
         </div>
 
-        <section class="bg-zinc-900/10 border border-zinc-900 p-6 rounded-sm space-y-4 shadow-xl">
+        <section class="bg-zinc-900/10 border border-zinc-900 p-5 rounded-none space-y-4 shadow-xl">
             <div
                 class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-900 pb-3">
                 <div class="flex items-center gap-2">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-blue-200">History Archive</h2>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-400">History Archive Registry</h2>
                 </div>
                 <div class="w-full sm:w-64 relative">
                     <input type="text" id="registrySearchInput" onkeyup="filterRegistryTable()"
-                        placeholder="Search registry..."
-                        class="w-full bg-zinc-950 border border-zinc-800 px-3 py-2 pl-7 rounded-sm text-xs focus:outline-none">
-                    <span class="absolute left-2 top-2 text-zinc-700 text-xs font-bold">⌕</span>
+                        placeholder="Search thread hash logs..."
+                        class="w-full bg-zinc-950 border border-zinc-800 px-3 py-2 pl-7 rounded-none text-xs text-zinc-300 focus:outline-none focus:border-zinc-700 transition-all font-mono">
+                    <span class="absolute left-2.5 top-2.5 text-zinc-700 text-[10px] font-bold">⌕</span>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-zinc-900 text-[10px] text-zinc-500 uppercase tracking-widest">
+                        <tr
+                            class="border-b border-zinc-900 text-[9px] text-zinc-600 uppercase tracking-widest font-bold">
                             <th class="py-3 px-2">Thread identifier</th>
                             <th class="py-3 px-2">Subject record</th>
                             <th class="py-3 px-2">Gross Claim</th>
@@ -326,7 +401,7 @@
                             <th class="py-3 px-2 text-right">Dossier</th>
                         </tr>
                     </thead>
-                    <tbody id="historyTableBody" class="text-xs divide-y divide-zinc-900/50 text-zinc-400">
+                    <tbody id="historyTableBody" class="text-xs divide-y divide-zinc-900/40 text-zinc-400 font-mono">
                         <tr>
                             <td colspan="6" class="py-4 text-center text-zinc-600 italic">No archive log matrices
                                 available.</td>
@@ -338,76 +413,76 @@
     </div>
 
     <div id="dossierModal"
-        class="hidden fixed inset-0 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-zinc-900 border border-zinc-800 max-w-xl w-full p-6 shadow-2xl rounded-sm space-y-4">
+        class="hidden fixed inset-0 bg-zinc-950/80 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-all">
+        <div class="bg-zinc-900 border border-zinc-800 max-w-xl w-full p-5 shadow-2xl rounded-none space-y-4 relative">
             <div class="flex justify-between items-center border-b border-zinc-900 pb-2">
-                <h4 id="modalTitle" class="text-xs font-bold text-zinc-400 uppercase tracking-widest">[DOSSIER]
-                    EXTRACTED PROFILES</h4>
-                <button onclick="closeModal()" class="text-zinc-600 hover:text-zinc-300 text-xs font-bold">[ESC]
+                <h4 id="modalTitle" class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono">
+                    [DOSSIER] EXTRACTED PROFILE REGISTRY</h4>
+                <button onclick="closeModal()"
+                    class="text-zinc-600 hover:text-zinc-300 text-[10px] font-bold tracking-wider transition-colors">[ESC]
                     CLOSE</button>
             </div>
             <div
-                class="grid grid-cols-2 gap-x-4 gap-y-2.5 bg-zinc-950 p-4 border border-zinc-900 text-zinc-400 text-xs leading-relaxed">
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Patient Identity Name</span><span
-                        id="mName" class="text-zinc-200 font-bold"></span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Biological Sex</span><span
-                        id="mSex" class="text-zinc-200 font-bold"></span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Age Matrix Profile</span><span
-                        id="mAge" class="text-zinc-200 font-bold"></span></div>
-                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold">Assigned Trial Cohort</span><span
-                        id="mCohort" class="text-zinc-300 font-bold break-words block"></span></div>
-                <div class="col-span-2"><span class="text-[9px] text-zinc-600 block uppercase font-bold">Timeline
-                        History Tracks</span><span id="mHistory" class="text-zinc-300 block break-words"></span></div>
+                class="grid grid-cols-2 gap-x-4 gap-y-3 bg-zinc-950 p-4 border border-zinc-900 text-zinc-400 text-xs leading-relaxed font-mono">
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Patient
+                        Identity Name</span><span id="mName" class="text-zinc-200 font-bold"></span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Biological
+                        Sex</span><span id="mSex" class="text-zinc-200 font-bold"></span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Age Matrix
+                        Profile</span><span id="mAge" class="text-zinc-200 font-bold"></span></div>
+                <div><span class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Assigned
+                        Trial Cohort</span><span id="mCohort" class="text-zinc-300 font-bold break-words block"></span>
+                </div>
+                <div class="col-span-2"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Timeline
+                        History Tracks</span><span id="mHistory"
+                        class="text-zinc-300 block break-words font-sans leading-relaxed"></span></div>
 
-                <div class="border-t border-zinc-900 pt-2"><span
-                        class="text-[9px] text-zinc-600 block uppercase font-bold">Isolation Fees Paid</span><span
-                        id="mFeeIso" class="text-zinc-300"></span></div>
-                <div class="border-t border-zinc-900 pt-2"><span
-                        class="text-[9px] text-zinc-600 block uppercase font-bold">Labor Compounding Paid</span><span
-                        id="mFeeLabor" class="text-zinc-300"></span></div>
-                <div class="col-span-2 border-t border-zinc-900 pt-2"><span
-                        class="text-[9px] text-zinc-600 block uppercase font-bold">Matched RAG Vectors Layer</span><span
-                        id="mTrust" class="text-zinc-300 font-bold"></span></div>
+                <div class="border-t border-zinc-900/80 pt-2"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Isolation Fees
+                        Paid</span><span id="mFeeIso" class="text-zinc-300"></span></div>
+                <div class="border-t border-zinc-900/80 pt-2"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Labor
+                        Compounding Paid</span><span id="mFeeLabor" class="text-zinc-300"></span></div>
+                <div class="col-span-2 border-t border-zinc-900/80 pt-2"><span
+                        class="text-[9px] text-zinc-600 block uppercase font-bold tracking-wider mb-0.5">Matched RAG
+                        Vectors Layer</span><span id="mTrust" class="text-blue-400 font-bold"></span></div>
 
                 <div
-                    class="col-span-2 border-t border-zinc-900 pt-2 bg-zinc-900/20 p-2 border border-zinc-900 rounded-sm">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-[9px] text-blue-400 uppercase font-bold">Final Action Decision</span>
+                    class="col-span-2 border-t border-zinc-900/80 pt-2.5 bg-zinc-900/10 p-3 border border-zinc-900 rounded-none">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-[9px] text-blue-500 uppercase font-bold tracking-wider">Final Action
+                            Decision</span>
                         <span id="mStatus"
-                            class="text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-sm"></span>
+                            class="text-[9px] px-2 py-0.5 border font-bold uppercase rounded-none"></span>
                     </div>
                     <div class="mt-1">
                         <span id="mReason"
-                            class="text-zinc-400 text-[11px] font-sans block leading-normal mt-0.5 whitespace-pre-wrap"></span>
+                            class="text-zinc-400 text-[11px] font-sans block leading-relaxed whitespace-pre-wrap"></span>
                     </div>
                 </div>
 
                 <div class="col-span-2 border-t border-zinc-900 pt-1.5"><span
-                        class="text-[9px] text-zinc-600 block uppercase font-bold">Database Commit Timestamp</span><span
-                        id="mTime" class="text-zinc-300 font-bold"></span></div>
+                        class="text-[9px] text-zinc-600 block uppercase font-bold mb-0.5">Database Commit
+                        Timestamp</span><span id="mTime" class="text-zinc-400 font-bold"></span></div>
             </div>
+
             <div class="border-t border-zinc-900 pt-3 space-y-2">
-                <h5 class="text-[9px] text-rose-500 font-bold uppercase tracking-wider"> PRIVACY CONTROL: COMPLIANCE
+                <h5 class="text-[9px] text-rose-500 font-bold uppercase tracking-wider">PRIVACY CONTROL: COMPLIANCE
                     ERASURE PROTOCOL</h5>
                 <div class="flex gap-2">
-                    <input type="password" id="adminToken" placeholder="Enter Administrative Key"
-                        class="flex-1 bg-zinc-950 border border-zinc-800 p-2 text-xs text-rose-400 focus:outline-none">
+                    <input type="password" id="adminToken" placeholder="Enter Administrative Key Token"
+                        class="flex-1 bg-zinc-950 border border-zinc-800 p-2 text-xs text-rose-400 font-mono focus:outline-none focus:border-rose-900/80 transition-all rounded-none">
                     <button id="purgeBtn"
-                        class="bg-rose-950/20 hover:bg-rose-900/40 border border-rose-900 text-rose-300 px-4 py-2 uppercase font-bold text-xs">Purge</button>
+                        class="bg-rose-950/10 hover:bg-rose-900/30 border border-rose-900 text-rose-400 px-4 py-2 uppercase font-bold text-xs transition-colors rounded-none">Purge</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Use relative pathing so it handles both local deployment and live production clusters flawlessly
-        // const API = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
-        //     ? "http://127.0.0.1:8000"
-        //     : "https://ledgervi-backend.onrender.com";
-        // 
-        // const API = "https://ledgervi-backend.onrender.com";
-
-        const API = "http://127.0.0.1:8000";
+        const API = "https://ledgervi-backend.onrender.com";
+        // const API = "http://127.0.0.1:8000";
 
         let localHistoryCache = [];
 
@@ -425,10 +500,10 @@
             const newRow = document.createElement("div");
             newRow.className = "grid grid-cols-12 gap-1.5 history-row items-center mt-1 animate-fadeIn";
             newRow.innerHTML = `
-                <input type="text" placeholder="Date" class="col-span-3 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm" value="03/06/2026">
-                <input type="text" placeholder="Sev" class="col-span-2 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm" value="Grade 1">
-                <input type="text" placeholder="Description" class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm">
-                <button onclick="removeHistoryRow(this)" class="col-span-2 text-[10px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">-[X]</button>
+                <input type="text" placeholder="Date" class="col-span-3 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none font-mono" value="03/06/2026">
+                <input type="text" placeholder="Sev" class="col-span-2 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none" value="Grade 1">
+                <input type="text" placeholder="Description" class="col-span-5 bg-zinc-950 border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 focus:outline-none rounded-none">
+                <button onclick="removeHistoryRow(this)" class="col-span-2 text-[10px] text-rose-500 hover:text-rose-400 font-bold uppercase text-center">-[X]</button>
             `;
             container.appendChild(newRow);
         }
@@ -471,16 +546,16 @@
                 return;
             }
             tbody.innerHTML = dataset.map((r, index) => `
-                <tr class="hover:bg-zinc-900/30 transition-all border-b border-zinc-900/30">
+                <tr class="hover:bg-zinc-900/20 transition-all border-b border-zinc-900/20">
                     <td class="py-3 px-2 text-zinc-300 font-bold tracking-wider">${r.thread_id}</td>
                     <td class="py-3 px-2 text-zinc-400">${r.patient_name}</td>
                     <td class="py-3 px-2 text-zinc-500">£${(r.claim_amount || 0).toLocaleString()}</td>
-                    <td class="py-3 px-2 text-emerald-500 font-bold">£${(r.payout_amount || 0).toLocaleString()}</td>
+                    <td class="py-3 px-2 text-emerald-400 font-bold">£${(r.payout_amount || 0).toLocaleString()}</td>
                     <td class="py-3 px-2">
-                        <span class="text-[9px] px-2 py-0.5 border font-bold ${r.status && r.status.includes('APPROVE') ? 'bg-emerald-950/20 text-emerald-400 border-emerald-900/60' : 'bg-amber-950/40 text-amber-400 border-amber-900/60'}">${r.status}</span>
+                        <span class="text-[9px] px-2 py-0.5 border font-bold ${r.status && r.status.includes('APPROVE') ? 'bg-emerald-950/20 text-emerald-400 border-emerald-900/40' : 'bg-amber-950/40 text-amber-400 border-amber-900/40'}">${r.status}</span>
                     </td>
                     <td class="py-3 px-2 text-right">
-                        <button onclick="openDossierModal(${index})" class="text-[9px] border border-zinc-800 bg-zinc-950/80 px-2.5 py-0.5 uppercase font-bold text-zinc-500 hover:text-zinc-900 hover:border-zinc-700 hover:bg-zinc-300 transition-all">Inspect</button>
+                        <button onclick="openDossierModal(${index})" class="text-[9px] border border-zinc-800 bg-zinc-950/50 px-2.5 py-0.5 uppercase font-bold text-zinc-500 hover:text-zinc-200 hover:border-zinc-600 hover:bg-zinc-900 transition-all">Inspect</button>
                     </td>
                 </tr>
             `).join('');
@@ -507,7 +582,6 @@
             document.getElementById("mCohort").innerText = data.patient_cohort || '--';
             document.getElementById("mHistory").innerText = data.clinical_history_summary || "None Mapped";
 
-            // Defensive null guards to block formatting script breaks
             document.getElementById("mFeeIso").innerText = `£${(data.invoice_isolation_fees || 0).toLocaleString()}`;
             document.getElementById("mFeeLabor").innerText = `£${(data.invoice_labor_fees || 0).toLocaleString()}`;
 
@@ -523,9 +597,9 @@
             statusBox.innerText = currentStatus;
 
             if (currentStatus.includes('APPROVE')) {
-                statusBox.className = "text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-sm bg-emerald-950/40 text-emerald-400 border-emerald-900/60";
+                statusBox.className = "text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-none bg-emerald-950/40 text-emerald-400 border-emerald-900/60";
             } else {
-                statusBox.className = "text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-sm bg-amber-950/40 text-amber-400 border-amber-900/60";
+                statusBox.className = "text-[9px] px-1.5 py-0.5 border font-bold uppercase rounded-none bg-amber-950/40 text-amber-400 border-amber-900/60";
             }
 
             document.getElementById("purgeBtn").onclick = () => executeRecordPurge(data.thread_id);
@@ -541,7 +615,6 @@
             const token = document.getElementById("adminToken").value.trim();
             if (!token) { alert("Admin token required!"); return; }
             try {
-                // Correct query encoding syntax path mapping
                 const res = await fetch(`${API}/api/claims/purge/${encodeURIComponent(threadId)}?admin_signature=${encodeURIComponent(token)}`, { method: "DELETE" });
                 if (res.status === 403) { alert("Access Denied."); return; }
                 closeModal(); await fetchMetrics(); await fetchHistory();
@@ -559,11 +632,19 @@
         async function runIngestPipeline() {
             const targetThread = document.getElementById("threadId").value.trim();
             const btn = document.getElementById("ingestBtn");
+            const tracePanel = document.getElementById("terminalTrace");
+            const traceLog = document.getElementById("terminalLogDynamic");
+
             if (!targetThread) { alert("Thread key required!"); return; }
 
             btn.disabled = true; btn.innerText = "RUNNING COMPLIANCE GRAPH...";
+
+            // Terminal simulation trigger
+            tracePanel.classList.remove("hidden");
+            traceLog.innerHTML = `<div class="text-zinc-500">&gt; [Router] Evaluating ingestion path for hash branch ${targetThread}...</div>`;
+
             document.getElementById("statusLabel").innerText = "CORE_PROCESSING";
-            document.getElementById("statusLabel").className = "text-xs px-2.5 py-1 rounded-sm bg-emerald-950 text-emerald-200 border border-emerald-900 font-bold justify-self-end w-fit";
+            document.getElementById("statusLabel").className = "text-[9px] px-2.5 py-0.5 border text-emerald-400 bg-zinc-950 border-emerald-900 uppercase tracking-widest font-bold justify-self-end w-fit";
 
             const historyLogs = [];
             document.querySelectorAll(".history-row").forEach(row => {
@@ -576,6 +657,13 @@
                     });
                 }
             });
+
+            // Mid-execution simulated log trace append to yield a better presentation aesthetic
+            setTimeout(() => {
+                if (btn.disabled) {
+                    traceLog.innerHTML += `<div class="text-zinc-400">&gt; [Worker: FinTech Underwriter] Processing deterministic arithmetic matrix...</div>`;
+                }
+            }, 1200);
 
             try {
                 const res = await fetch(`${API}/api/claims/ingest?thread_id=${encodeURIComponent(targetThread)}`, {
@@ -605,6 +693,8 @@
                 });
                 const data = await res.json();
 
+                traceLog.innerHTML += `<div class="text-emerald-500">&gt; Checkpoint reached. Graph paused at human barrier node successfully.</div>`;
+
                 document.getElementById("ledgerPayout").innerText = `£${(data.authorized_payout || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
                 document.getElementById("ledgerDispute").innerText = `£${(data.escrow_dispute || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 
@@ -614,23 +704,23 @@
 
                 const currentVerdict = data.verdict || "";
                 verdictBlock.innerText = currentVerdict;
-                verdictBlock.className = "p-3 text-xs leading-relaxed min-h-[64px] max-h-[82px] overflow-y-auto whitespace-pre-wrap rounded-sm border border-zinc-800 font-sans ";
+                verdictBlock.className = "p-4 text-xs leading-relaxed min-h-[64px] max-h-[82px] overflow-y-auto whitespace-pre-wrap rounded-none border font-sans ";
 
                 if (currentVerdict.includes("HIGH_MEDICAL_RISK")) {
-                    verdictBlock.classList.add("bg-rose-950/20", "text-rose-300", "border-rose-900/60");
-                    statusBadge.className = "text-xs px-2.5 py-1 rounded-sm bg-rose-950 text-rose-400 border border-rose-900 font-bold";
+                    verdictBlock.classList.add("bg-rose-950/10", "text-rose-400", "border-rose-900/40");
+                    statusBadge.className = "text-[9px] px-2.5 py-0.5 border text-rose-400 bg-zinc-950 border-rose-900 uppercase tracking-widest font-bold";
                     telemetryBadge.innerText = "CRITICAL_ALERT";
-                    telemetryBadge.className = "text-rose-400 font-bold text-xs";
+                    telemetryBadge.className = "text-rose-400 font-bold text-xs font-mono";
                 } else if (currentVerdict.includes("HIGH_FINANCIAL_RISK")) {
-                    verdictBlock.classList.add("bg-amber-950/20", "text-amber-300", "border-amber-900/60");
-                    statusBadge.className = "text-xs px-2.5 py-1 rounded-sm bg-amber-950 text-amber-400 border border-amber-900 font-bold";
+                    verdictBlock.classList.add("bg-amber-950/10", "text-amber-400", "border-amber-900/40");
+                    statusBadge.className = "text-[9px] px-2.5 py-0.5 border text-amber-400 bg-zinc-950 border-amber-900 uppercase tracking-widest font-bold";
                     telemetryBadge.innerText = "SUSPENDED_AUDIT";
-                    telemetryBadge.className = "text-amber-400 font-bold text-xs";
+                    telemetryBadge.className = "text-amber-400 font-bold text-xs font-mono";
                 } else {
-                    verdictBlock.classList.add("bg-emerald-950/20", "text-emerald-300", "border-emerald-900/60");
-                    statusBadge.className = "text-xs px-2.5 py-1 rounded-sm bg-emerald-950 text-emerald-400 border border-emerald-900 font-bold";
+                    verdictBlock.classList.add("bg-emerald-950/10", "text-emerald-400", "border-emerald-900/40");
+                    statusBadge.className = "text-[9px] px-2.5 py-0.5 border text-emerald-400 bg-zinc-950 border-emerald-900 uppercase tracking-widest font-bold";
                     telemetryBadge.innerText = "ACTIVE_STREAMING";
-                    telemetryBadge.className = "text-emerald-400 font-bold text-xs";
+                    telemetryBadge.className = "text-emerald-400 font-bold text-xs font-mono";
                 }
 
                 document.getElementById("trustReg").innerText = data.matched_rule_id || "REG-NONE";
@@ -647,7 +737,7 @@
                 document.getElementById("ragClauseDisplay").innerText = data.raw_clause_text || "No baseline contract clause text returned.";
 
                 document.getElementById("statusLabel").innerText = "TRANSACTION_PAUSED";
-                document.getElementById("statusLabel").className = "text-xs px-2.5 py-1 rounded-sm bg-amber-950 text-amber-400 border border-amber-900 font-bold justify-self-end w-fit";
+                document.getElementById("statusLabel").className = "text-[9px] px-2.5 py-0.5 border text-amber-400 bg-zinc-950 border-amber-900 uppercase tracking-widest font-bold justify-self-end w-fit";
 
                 updateMetrics(data.metrics);
                 document.getElementById("actionPanel").classList.remove("hidden");
@@ -670,9 +760,10 @@
                     body: JSON.stringify({ action: action })
                 });
                 document.getElementById("statusLabel").innerText = "TRANSACTION_CLOSED";
-                document.getElementById("statusLabel").className = "text-xs px-3 py-1 rounded-sm bg-emerald-950 flex justify-between border border-emerald-800 text-emerald-200 tracking-wider font-bold transition-all justify-self-end w-fit";
+                document.getElementById("statusLabel").className = "text-[9px] px-2.5 py-0.5 border text-emerald-400 bg-zinc-950 border-emerald-900 uppercase tracking-widest font-bold justify-self-end w-fit";
                 await fetchMetrics(); await fetchHistory();
                 document.getElementById("actionPanel").classList.add("hidden");
+                document.getElementById("terminalTrace").classList.add("hidden");
             } catch (err) { alert("Action exception."); }
         }
     </script>
