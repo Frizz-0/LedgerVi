@@ -9,11 +9,9 @@ An enterprise-grade, multi-agent AI platform that automates the auditing, risk c
   </a>
 
   <br />
-
-   <a href="https://www.finos.org/hubfs/Projects%20%2B%20SIGs/Open%20Source%20Readiness%20OSR/OSR%20Meeting_%20GitProxy%20Jamie%20Slome%20Citi%20Presentation.mp4#t=496">Demo</a>
+Click here for Live [Demo](https://ledger-vi.vercel.app/)
   <br />
-  <br />
-
+  
 ![Python](https://img.shields.io/badge/Python-3.8+-3776ab?style=flat-square&logo=python)
 ![Ollama](https://img.shields.io/badge/llama-3.3+-ee4c2c?style=flat-square&logo=ollama)
 ![Agents](https://img.shields.io/badge/Core-AgenticAI-brightgreen?style=flat-square)
