@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LedgerVi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="Lvi_logo0_s.png">
     <style>
         ::-webkit-scrollbar {
             width: 4px;
@@ -66,12 +67,12 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div class="col-span-2">
                         <label class="text-zinc-600 block mb-0.5">Full Name</label>
-                        <input type="text" id="inputName" value="Eleanor Vance"
+                        <input type="text" id="inputName" value="Geordi La Forge"
                             class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
                     </div>
                     <div>
                         <label class="text-zinc-600 block mb-0.5">Age</label>
-                        <input type="number" id="inputAge" value="64"
+                        <input type="number" id="inputAge" value="35"
                             class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
                     </div>
                     <div>
@@ -90,7 +91,7 @@
                     </div>
                     <div class="col-span-3">
                         <label class="text-zinc-600 block mb-0.5">Trial Cohort Segment</label>
-                        <input type="text" id="inputCohort" value="Arm-B (High Toxicity Max Compounds)"
+                        <input type="text" id="inputCohort" value="Arm-A (High-Density Compound Injections)"
                             class="w-full bg-zinc-900 border border-zinc-800 p-1 text-zinc-300 focus:outline-none">
                     </div>
                 </div>
@@ -106,17 +107,17 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Isolation *</label>
-                        <input type="number" id="feeIso" value="90000"
+                        <input type="number" id="feeIso" value="10000"
                             class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
                     </div>
                     <div>
                         <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Labor *</label>
-                        <input type="number" id="feeLabor" value="20000"
+                        <input type="number" id="feeLabor" value="25000"
                             class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
                     </div>
                     <div>
                         <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Aux Meds *</label>
-                        <input type="number" id="feeMed" value="15000"
+                        <input type="number" id="feeMed" value="32000"
                             class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-mono font-bold text-zinc-100 focus:outline-none focus:border-blue-500 rounded-sm">
                     </div>
                     <div class="col-span-3 pt-1">
@@ -124,12 +125,12 @@
                             <div>
                                 <label class="text-[10px] text-zinc-400 block mb-1 uppercase font-bold">Thread Key
                                     *</label>
-                                <input type="text" id="threadId" value="tx_ref_9922"
+                                <input type="text" id="threadId" value="tx_ref_9002"
                                     class="w-full bg-zinc-900 border-2 border-zinc-700 p-2 text-xs font-bold text-blue-300 focus:outline-none focus:border-blue-500 rounded-sm">
                             </div>
                             <div>
                                 <label class="text-[10px] text-zinc-500 block mb-1 uppercase">Gross Total</label>
-                                <input type="number" id="claimAmount" value="125000"
+                                <input type="number" id="claimAmount" value="67000"
                                     class="w-full bg-zinc-950 border border-zinc-900 p-2 text-xs text-emerald-400 font-bold focus:outline-none"
                                     disabled>
                             </div>
@@ -154,7 +155,7 @@
                                 value="Grade 1">
                             <input type="text" placeholder="Description"
                                 class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
-                                value="Mild Headache">
+                                value="Mild Fatigue">
                             <button onclick="removeHistoryRow(this)"
                                 class="col-span-2 text-[12px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">[X]</button>
                         </div>
@@ -167,7 +168,7 @@
                                 value="Grade 2">
                             <input type="text" placeholder="Description"
                                 class="col-span-5 bg-zinc-900 border border-zinc-800 px-2 py-1 text-xs text-zinc-300 focus:outline-none rounded-sm"
-                                value="Acute Toxic Localized Rash">
+                                value="Mild Headache">
                             <button onclick="removeHistoryRow(this)"
                                 class="col-span-2 text-[12px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter text-center">[X]</button>
                         </div>
@@ -190,7 +191,7 @@
                         class="text-xs text-zinc-400 uppercase font-bold tracking-wider block border-b border-zinc-900 pb-2">Doctor's
                         Clinical Activity Records Note Narrative *</span>
                     <textarea id="procedureNotes"
-                        class="w-full flex-1 min-h-[150px] bg-zinc-950 border-2 border-zinc-800 p-3 rounded-sm text-xs text-zinc-100 focus:outline-none focus:border-blue-500 resize-none font-sans leading-relaxed tracking-wide">Emergency Administration of high-dose Macrolide compound and private ward isolation. Patient exhibited acute respiratory distress and severe skin lesions following standard trial drug baseline delivery.</textarea>
+                        class="w-full flex-1 min-h-[150px] bg-zinc-950 border-2 border-zinc-800 p-3 rounded-sm text-xs text-zinc-100 focus:outline-none focus:border-blue-500 resize-none font-sans leading-relaxed tracking-wide">Subject reported for standard follow-up diagnostics. Completed routine secondary lab assays alongside deep intra-venous compounding formulation labor adjustments. All baseline clinical parameters remained fully within expected thresholds at release.</textarea>
                 </div>
                 <button id="ingestBtn" onclick="runIngestPipeline()"
                     class="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-bold py-3 text-xs uppercase tracking-widest transition-all mt-4">
@@ -403,7 +404,7 @@
         // const API = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
         //     ? "http://127.0.0.1:8000"
         //     : "https://ledgervi-backend.onrender.com";
-
+        // 
         // const API = "https://ledgervi-backend.onrender.com";
 
         const API = "http://127.0.0.1:8000";

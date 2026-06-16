@@ -59,8 +59,9 @@ For each regulation:
 1. Read the EXACT trigger condition the regulation requires.
 2. Read what the patient's notes ACTUALLY document.
 3. Mark YES only if the notes explicitly document the threshold condition. Do not infer.
-4. For sourcing/procurement regulations: mark YES if the notes explicitly describe that sourcing scenario.
-5. If the patient's condition is milder, different, or unrelated to the threshold — mark NO.
+4. For regulations that require MULTIPLE conditions: every single stated condition must be explicitly present in the notes. Matching ONE condition out of TWO or more is NOT sufficient to trigger the regulation.
+5. REG-550 specifically requires BOTH: (a) therapy was administered at a location OUTSIDE the primary trial site, AND (b) the episode was explicitly described as acute and life-threatening. An external or un-audited supplier alone does NOT satisfy REG-550 unless both conditions are directly stated.
+6. If the patient's condition is milder, different, or only partially matches the threshold — mark NO.
 
 Return ONLY a raw JSON array of the IDs of regulations that are genuinely triggered.
 Use exact ID strings as shown (e.g. "REG-550"). Return [] if none apply.
@@ -228,6 +229,15 @@ def fintech_underwriter_node(state: TrialState):
     print("[Worker: FinTech Underwriter] Executing hybrid deterministic financial audit...")
     matched_contract, default_clause_id, clause_docs = trialguard_db.query_financial(state["procedure_notes"])
 
+    # Build exact clause ID → document text lookup so we can validate LLM outputs
+    # and reorder display text reliably (primary clause always first)
+    id_to_doc: dict[str, str] = {}
+    for doc in clause_docs:
+        if ":" in doc:
+            cid = doc.split(":")[0].strip()
+            id_to_doc[cid] = doc
+    valid_clause_ids = set(id_to_doc.keys())
+
     iso   = float(state.get("invoice_isolation_fees", 0.0))
     labor = float(state.get("invoice_labor_fees", 0.0))
     meds  = float(state.get("invoice_medication_fees", 0.0))
@@ -238,7 +248,13 @@ def fintech_underwriter_node(state: TrialState):
         "invoice_medication_fees": meds
     }
 
+    # Provide the LLM with the exact clause IDs it is allowed to use — prevents hallucination
+    available_clause_ids = ", ".join(f'"{cid}"' for cid in valid_clause_ids)
+
     prompt = f"""You are a financial compliance analyst. For each billing line item, classify which policy clause applies. Do NOT compute any monetary amounts.
+
+### Available Clause IDs — use ONLY these exact strings for rule_id:
+{available_clause_ids}
 
 ### Billing Line Items:
 1. invoice_isolation_fees: £{iso}
@@ -254,7 +270,7 @@ def fintech_underwriter_node(state: TrialState):
 ### Rule Types — select one per item:
 - "full_approval": No clause targets this fee type, or conditions are unmet. Approved at face value.
 - "cap": Clause sets a single ceiling limit for THIS specific fee type on its own. Set "limit" parameter.
-- "exclusion": Fee explicitly not covered or excluded. For sourcing exclusions, use only if notes explicitly state non-affiliated nodes.
+- "exclusion": ONLY use if the clinical notes EXPLICITLY contain words such as "un-audited", "non-affiliated", "third-party supplier", "external pharmaceutical", or equivalent language confirming the medication/therapy was sourced outside sanctioned channels. Generic terms like "compounding", "auxiliary", "formulation", or "pharmacy" do NOT trigger exclusion. If notes say medications came from primary site, affiliated, or on-site pharmacies, use "full_approval" — this is the opposite of an exclusion trigger.
 - "combined_cap": Clause sets a single shared ceiling across MULTIPLE fee types together. Assign matching "combined_cap_group" names and limits across entries.
 
 Output ONLY a raw JSON payload matching this template array exactly with no markdown fences:
@@ -295,6 +311,13 @@ Output ONLY a raw JSON payload matching this template array exactly with no mark
 
     if data and isinstance(data, dict):
         rule_decisions = data.get("rule_decisions", [])
+        # 🛡️ VALIDATION: Discard any rule_id the LLM returned that is not in the retrieved clause set.
+        # This prevents hallucinated or mismatched IDs from corrupting the math or the display.
+        for r in rule_decisions:
+            if r.get("rule_id") not in valid_clause_ids:
+                r["rule_id"] = "NONE"
+                r["rule_type"] = "full_approval"
+                r["limit"] = None
         justifications = " | ".join(f"{r.get('fee_key')}: {r.get('justification')}" for r in rule_decisions)
     else:
         rule_decisions = []
@@ -304,38 +327,62 @@ Output ONLY a raw JSON payload matching this template array exactly with no mark
     payout  = result["authorized_payout"]
     dispute = result["escrow_dispute_amount"]
 
-    # 🛡️ SYSTEM INTEGRITY FIX: Track the exact rule responsible for generating the active dispute
-    largest_deduction = -1.0
+    # 🛡️ SYSTEM INTEGRITY FIX: Determine the primary triggered clause using rule type priority.
+    # Priority: exclusion=3 > combined_cap=2 > cap=1 > full_approval=0.
+    # Within the same priority tier, the item with the largest financial deduction wins.
+    # This guarantees matched_clause_id always reflects the most impactful active rule.
+    RULE_PRIORITY = {"exclusion": 3, "combined_cap": 2, "cap": 1, "full_approval": 0}
+
+    best_priority   = -1
+    best_dispute_amt = -1.0
     final_clause_id = "POLICY-UNKNOWN"
 
     for item in rule_decisions:
         fee_key = item.get("fee_key")
-        r_id = item.get("rule_id")
-        
-        if fee_key and r_id and r_id != "NONE" and r_id != "POLICY-UNKNOWN":
-            item_disputed = float(result["per_item_disputed"].get(fee_key, 0.0))
-            
-            if item_disputed > largest_deduction:
-                largest_deduction = item_disputed
-                final_clause_id = r_id
+        r_id    = item.get("rule_id")
+        r_type  = item.get("rule_type", "full_approval")
 
-    # If no line item caused a clean penalty deduction fallback to default RAG track
-    if final_clause_id == "POLICY-UNKNOWN" or largest_deduction <= 0.0:
+        if not r_id or r_id in ("NONE", "POLICY-UNKNOWN"):
+            continue
+
+        priority     = RULE_PRIORITY.get(r_type, 0)
+        item_disputed = float(result["per_item_disputed"].get(fee_key, 0.0)) if fee_key else 0.0
+
+        if (priority > best_priority) or (priority == best_priority and item_disputed > best_dispute_amt):
+            best_priority    = priority
+            best_dispute_amt = item_disputed
+            final_clause_id  = r_id
+
+    # If the deterministic engine produced zero escrow, no clause actually penalised anything.
+    # Use POLICY-UNKNOWN regardless of what the LLM labelled — labels without deductions are meaningless.
+    # Only fall back to the RAG primary hit if a real deduction exists but clause ID resolution failed.
+    if dispute == 0.0:
+        final_clause_id = "POLICY-UNKNOWN"
+    elif final_clause_id == "POLICY-UNKNOWN":
+        # Active deduction exists but clause ID resolution failed — fall back to primary RAG hit
         final_clause_id = default_clause_id
 
     if not result["integrity_ok"]:
         final_clause_id = "INTEGRITY-FAIL"
         justifications = "Arithmetic integrity check failed. Full claim diverted to escrow."
 
-    # Filter clause context to only the docs whose clause ID was actually applied
-    applied_rule_ids = {r.get("rule_id") for r in rule_decisions if r.get("rule_id") and r.get("rule_id") != "NONE"}
-    filtered_docs = [doc for doc in clause_docs if any(rid in doc for rid in applied_rule_ids)]
-    display_clause_text = "\n".join(filtered_docs) if filtered_docs else matched_contract
+    # 🛡️ DISPLAY INTEGRITY: Build clause context with the primary (matched) clause doc FIRST,
+    # then any other applied clause docs. This guarantees the top-1 of Clause Context always
+    # corresponds exactly to the matched_clause_id shown in the UI.
+    applied_rule_ids = {
+        r.get("rule_id") for r in rule_decisions
+        if r.get("rule_id") and r.get("rule_id") not in ("NONE", "POLICY-UNKNOWN")
+    }
+    primary_doc    = id_to_doc.get(final_clause_id, "")
+    secondary_docs = [id_to_doc[cid] for cid in applied_rule_ids if cid != final_clause_id and cid in id_to_doc]
 
-    if final_clause_id == "POLICY-UNKNOWN" or dispute == 0.0:
-        calculated_confidence = 94.5
+    if primary_doc:
+        display_clause_text = primary_doc + ("\n" + "\n".join(secondary_docs) if secondary_docs else "")
     else:
-        calculated_confidence = 94.5 if final_clause_id in display_clause_text else 88.0
+        # Fallback: show all retrieved clause docs
+        display_clause_text = matched_contract
+
+    calculated_confidence = 94.5 if final_clause_id in display_clause_text else 88.0
 
     print(f"   [Audit] Authorized: £{payout} | Dispute: £{dispute} | Clause: {final_clause_id}")
 
