@@ -8,13 +8,17 @@ An enterprise-grade, multi-agent AI platform that automates the auditing, risk c
     <img src="./frontend/LedgerVi_Demo_0.gif">
   </a>
 
+  <br />
+
+   <a href="https://www.finos.org/hubfs/Projects%20%2B%20SIGs/Open%20Source%20Readiness%20OSR/OSR%20Meeting_%20GitProxy%20Jamie%20Slome%20Citi%20Presentation.mp4#t=496">Demo</a>
+  <br />
+  <br />
+
 ![Python](https://img.shields.io/badge/Python-3.8+-3776ab?style=flat-square&logo=python)
 ![Ollama](https://img.shields.io/badge/llama-3.3+-ee4c2c?style=flat-square&logo=ollama)
 ![Agents](https://img.shields.io/badge/Core-AgenticAI-brightgreen?style=flat-square)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=flat-square&logo=fastapi)
-![React](https://img.shields.io/badge/React-18+-61dafb?style=flat-square&logo=react)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=flat-square)
 
 </div>
 
