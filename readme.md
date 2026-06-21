@@ -1,7 +1,6 @@
 <div align="center">
 
-# LedgerVi — Clinical Trial Insurance Underwriting Engine
-
+# LedgerVi — Clinical Trial Insurance Platform
 An enterprise-grade, multi-agent AI platform that automates the auditing, risk classification, and financial settlement of clinical trial adverse event insurance claims. Built on LangGraph stateful orchestration with a hybrid architecture that separates LLM-based reasoning from deterministic Python financial execution.
 
 <a href="https://ledger-vi.vercel.app/">
@@ -32,7 +31,7 @@ Clinical trial insurance claims present two structural failure modes that neithe
 
 **The Unstructured Data Problem.** Over 80% of clinical event data arrives as free-text medical narratives written by physicians. Traditional rule engines cannot parse human phrasing or distinguish a standard drug delivery from an emergency rescue compound deployment.
 
-**The Deterministic Deficit of LLMs.** While large language models can read and reason over unstructured text, they are fundamentally non-deterministic and unreliable at executing precise financial arithmetic. Unconstrained LLMs routinely hallucinate numbers, misinterpret policy caps, and produce inconsistent results across identical inputs — an unacceptable failure mode in insurance underwriting.
+**The Deterministic Deficit of LLMs.** While large language models can read and reason over unstructured text, they are fundamentally non-deterministic and unreliable at executing precise financial arithmetic. Unconstrained LLMs routinely hallucinate numbers, misinterpret policy caps, and produce inconsistent results across identical inputs ,an unacceptable failure mode in insurance underwriting.
 
 LedgerVi solves both problems through architectural separation: LLMs handle reading and classification; Python handles all math.
 
@@ -96,7 +95,7 @@ Naive single-stage vector retrieval causes false positives. A patient with mild 
 
 **Stage 1 — Broad Recall.** ChromaDB returns the top N candidate regulations or contract clauses by semantic similarity. This casts a wide net without making any decision.
 
-**Stage 2 — LLM Reranker.** A 70B model reads the actual trigger conditions of each candidate against the exact clinical notes. It marks a regulation as applicable only when the notes explicitly document the required threshold — not when they merely resemble it. If no candidates pass, the pipeline returns `REG-NONE` cleanly. There is no fallback to the top hit.
+**Stage 2 — LLM Reranker.** A 70B model reads the actual trigger conditions of each candidate against the exact clinical notes. It marks a regulation as applicable only when the notes explicitly document the required threshold , not when they merely resemble it. If no candidates pass, the pipeline returns `REG-NONE` cleanly. There is no fallback to the top hit.
 
 This prevents semantic proximity from poisoning downstream risk classifications and financial decisions.
 
@@ -321,7 +320,7 @@ docker run -p 8000:8000 --env-file ../.env ledgervi
 
 ## Key Design Decisions
 
-**Why LangGraph over plain function calls?** LangGraph's stateful checkpointing natively supports human-in-the-loop breakpoints. The graph pauses mid-execution, persists its full state to a MemorySaver, and resumes from exactly the same point after a human decision — without re-running prior nodes.
+**Why LangGraph over plain function calls?** LangGraph's stateful checkpointing natively supports human-in-the-loop breakpoints. The graph pauses mid-execution, persists its full state to a MemorySaver, and resumes from exactly the same point after a human decision , without re-running prior nodes.
 
 **Why is the LLM not allowed to compute financial figures?** LLMs are non-deterministic. On identical inputs they may return different arithmetic results. Insurance underwriting requires reproducible, audit-compliant figures. The LLM is constrained to returning a classification label and a limit value only; Python computes all splits.
 
