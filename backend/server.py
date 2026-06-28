@@ -156,6 +156,7 @@ def query_aggregated_metrics() -> MetricsResponse:
             conn.close()
 
 @app.get("/")
+@app.head("/")
 async def root_health_check():
     return {
         "status": "ONLINE",
